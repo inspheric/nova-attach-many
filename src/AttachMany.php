@@ -96,7 +96,7 @@ class AttachMany extends Field
         return $this;
     }
 
-    public function fullWidth($fullWidth=true)
+    public function fullWidth($fullWidth = true)
     {
         $this->fullWidth = $fullWidth;
 
@@ -110,14 +110,14 @@ class AttachMany extends Field
         return $this;
     }
 
-    public function showCounts($showCounts=true)
+    public function showCounts($showCounts = true)
     {
         $this->showCounts = $showCounts;
 
         return $this;
     }
 
-    public function showPreview($showPreview=true)
+    public function showPreview($showPreview = true)
     {
         $this->showPreview = $showPreview;
 
