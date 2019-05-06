@@ -159,12 +159,12 @@ class AttachMany extends Field
     /**
      * Specify that the related resources should be displayed as chips on the detail view.
      *
-     * @param  bool  $chips
+     * @param  bool|string  $chips
      * @return $this
      */
-    public function chips(bool $chips = true)
+    public function chips($chips = true)
     {
-        $this->chips = $chips;
+        $this->chips = ($chips === 'square' ? 'square' : (bool) $chips);
 
         return $this;
     }

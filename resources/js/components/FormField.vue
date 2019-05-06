@@ -18,11 +18,17 @@
                             :tabindex="isFocused($index, true) ? 0 : -1"
                             :aria-checked="isFocused($index)"
                             ref="selectedItem"
-                            class="flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none"
-                            :class="{ 'bg-primary text-white': isFocused($index), 'py-1 pl-2': !resource.avatar }"
-                            @mousedown.ctrl.exact="addFocus($event, $index)"
-                            @mousedown.shift="addFocus($event, $index, true)"
+                            class="flex items-center m-1 pr-2 bg-30 select-none cursor-pointer outline-none"
+                            :class="{
+                                'bg-primary text-white': isFocused($index),
+                                'py-1 pl-2': !resource.avatar,
+                                'rounded-full': field.chips === true,
+                                'rounded': field.chips == 'square',
+                                }"
+                            @mousedown.left.ctrl.exact="addFocus($event, $index)"
+                            @mousedown.left.shift="addFocus($event, $index, true)"
                             @click.exact="focus($event, $index)"
+                            @click.right.prevent=""
                             @focus="pushFocus($event, $index)"
                             @keydown.delete.prevent="unselectFocused($event)"
                             @keydown.left.exact="focus($event, $index, -1)"
@@ -31,7 +37,10 @@
                             @keydown.right.shift="moveFocus($event, 1)"
                         >
                             <div v-if="resource.avatar" class="m-px mr-2">
-                                <img :src="resource.avatar" class="w-6 h-6 rounded-full block" />
+                                <img :src="resource.avatar" class="w-6 h-6 block" :class="{
+                                    'rounded-full': field.chips === true,
+                                    'rounded': field.chips == 'square',
+                                }" />
                             </div>
                             <span>{{ resource.display }}</span>
                             <span @click="unselect($event, $index, resource.value)"
@@ -51,7 +60,11 @@
                         <div
                             v-if="abandoned"
                             tabindex="0"
-                            class="py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex"
+                            class="py-1 px-2 m-1 bg-danger text-white select-none cursor-pointer outline-none flex"
+                            :class="{
+                                'rounded-full': field.chips === true,
+                                'rounded': field.chips == 'square',
+                            }"
                             @click="unabandon"
                         >
                             <span>{{ search }}</span>
@@ -86,7 +99,10 @@
                         <fake-checkbox :checked="selected.includes(resource.value)" />
                     </div>
                     <div v-if="resource.avatar" class="mr-3 flex-no-shrink">
-                        <img :src="resource.avatar" class="w-8 h-8 rounded-full block" />
+                        <img :src="resource.avatar" class="w-8 h-8 block" :class="{
+                            'rounded-full': field.chips === true,
+                            'rounded': field.chips == 'square',
+                        }" />
                     </div>
                     <span class="flex-no-grow">{{ resource.display }}</span>
                 </div>
@@ -218,6 +234,7 @@ export default {
         },
 
         addFocus(event, index, join) {
+
             let focused = this.focused || []
 
             if (join) {
@@ -243,7 +260,7 @@ export default {
             }
             else {
                 if (focused.includes(index)) {
-                    focused.splice(index, 1)
+                    focused = focused.filter(value => value != index)
                 }
                 else {
                     focused.push(index)

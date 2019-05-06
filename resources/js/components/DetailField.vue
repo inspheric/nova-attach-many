@@ -14,13 +14,17 @@
                         }"
                         class="dim no-underline"
                         :class="{
-                            'flex items-center m-1 pr-3 bg-30 rounded-full select-none cursor-pointer text-80': field.chips,
+                            'flex items-center m-1 pr-3 bg-30 select-none cursor-pointer text-80': field.chips,
+                            'rounded-full': field.chips === true,
+                            'rounded': field.chips == 'square',
                             'py-1 pl-2': field.chips && !item.avatar,
-                            'font-bold text-primary': !field.chips,
-                            }"
-                    >
+                            'font-bold text-primary': !field.chips
+                        }">
                         <div v-if="field.chips && item.avatar" class="m-px mr-2">
-                            <img :src="item.avatar" class="w-6 h-6 rounded-full block" />
+                            <img :src="item.avatar" class="w-6 h-6 block" :class="{
+                                'rounded-full': field.chips === true,
+                                'rounded': field.chips == 'square'
+                            }" />
                         </div>
                         {{ item.display }}<!--
                         --></router-link><!--
@@ -34,7 +38,9 @@
                     class="cursor-pointer"
                     :class="{
                         'text-primary dim': !field.chips, 'block mt-6 font-bold': !field.chips && expanded, 'inline-block': !field.chips && !expanded,
-                        'text-80 py-1 px-2 m-1 bg-white border border-50 rounded-full select-none cursor-pointer': field.chips,
+                        'text-80 py-1 px-2 m-1 bg-white border border-50 select-none cursor-pointer': field.chips,
+                        'rounded-full': field.chips === true,
+                        'rounded': field.chips == 'square',
                         }"
                     tabindex="0"
                     @keyup.enter="toggle"

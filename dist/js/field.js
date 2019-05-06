@@ -379,6 +379,22 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -482,6 +498,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             return this.focused.includes(index);
         },
         addFocus: function addFocus(event, index, join) {
+
             var focused = this.focused || [];
 
             if (join) {
@@ -504,7 +521,9 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                 }
             } else {
                 if (focused.includes(index)) {
-                    focused.splice(index, 1);
+                    focused = focused.filter(function (value) {
+                        return value != index;
+                    });
                 } else {
                     focused.push(index);
                 }
@@ -23460,10 +23479,12 @@ var render = function() {
                         ref: "selectedItem",
                         refInFor: true,
                         staticClass:
-                          "flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none",
+                          "flex items-center m-1 pr-2 bg-30 select-none cursor-pointer outline-none",
                         class: {
                           "bg-primary text-white": _vm.isFocused($index),
-                          "py-1 pl-2": !resource.avatar
+                          "py-1 pl-2": !resource.avatar,
+                          "rounded-full": _vm.field.chips === true,
+                          rounded: _vm.field.chips == "square"
                         },
                         attrs: {
                           tabindex: _vm.isFocused($index, true) ? 0 : -1,
@@ -23472,6 +23493,18 @@ var render = function() {
                         on: {
                           mousedown: [
                             function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k($event.keyCode, "left", 37, $event.key, [
+                                  "Left",
+                                  "ArrowLeft"
+                                ])
+                              ) {
+                                return null
+                              }
+                              if ("button" in $event && $event.button !== 0) {
+                                return null
+                              }
                               if (!$event.ctrlKey) {
                                 return null
                               }
@@ -23485,6 +23518,18 @@ var render = function() {
                               return _vm.addFocus($event, $index)
                             },
                             function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k($event.keyCode, "left", 37, $event.key, [
+                                  "Left",
+                                  "ArrowLeft"
+                                ])
+                              ) {
+                                return null
+                              }
+                              if ("button" in $event && $event.button !== 0) {
+                                return null
+                              }
                               if (!$event.shiftKey) {
                                 return null
                               }
@@ -23501,6 +23546,9 @@ var render = function() {
                               return null
                             }
                             return _vm.focus($event, $index)
+                          },
+                          contextmenu: function($event) {
+                            $event.preventDefault()
                           },
                           focus: function($event) {
                             return _vm.pushFocus($event, $index)
@@ -23617,7 +23665,11 @@ var render = function() {
                         resource.avatar
                           ? _c("div", { staticClass: "m-px mr-2" }, [
                               _c("img", {
-                                staticClass: "w-6 h-6 rounded-full block",
+                                staticClass: "w-6 h-6 block",
+                                class: {
+                                  "rounded-full": _vm.field.chips === true,
+                                  rounded: _vm.field.chips == "square"
+                                },
                                 attrs: { src: resource.avatar }
                               })
                             ])
@@ -23657,7 +23709,11 @@ var render = function() {
                         "div",
                         {
                           staticClass:
-                            "py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex",
+                            "py-1 px-2 m-1 bg-danger text-white select-none cursor-pointer outline-none flex",
+                          class: {
+                            "rounded-full": _vm.field.chips === true,
+                            rounded: _vm.field.chips == "square"
+                          },
                           attrs: { tabindex: "0" },
                           on: { click: _vm.unabandon }
                         },
@@ -23831,7 +23887,11 @@ var render = function() {
                         resource.avatar
                           ? _c("div", { staticClass: "mr-3 flex-no-shrink" }, [
                               _c("img", {
-                                staticClass: "w-8 h-8 rounded-full block",
+                                staticClass: "w-8 h-8 block",
+                                class: {
+                                  "rounded-full": _vm.field.chips === true,
+                                  rounded: _vm.field.chips == "square"
+                                },
                                 attrs: { src: resource.avatar }
                               })
                             ])
@@ -23977,6 +24037,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['resource', 'resourceName', 'resourceId', 'field'],
@@ -24040,8 +24106,10 @@ var render = function() {
                             {
                               staticClass: "dim no-underline",
                               class: {
-                                "flex items-center m-1 pr-3 bg-30 rounded-full select-none cursor-pointer text-80":
+                                "flex items-center m-1 pr-3 bg-30 select-none cursor-pointer text-80":
                                   _vm.field.chips,
+                                "rounded-full": _vm.field.chips === true,
+                                rounded: _vm.field.chips == "square",
                                 "py-1 pl-2": _vm.field.chips && !item.avatar,
                                 "font-bold text-primary": !_vm.field.chips
                               },
@@ -24059,7 +24127,12 @@ var render = function() {
                               _vm.field.chips && item.avatar
                                 ? _c("div", { staticClass: "m-px mr-2" }, [
                                     _c("img", {
-                                      staticClass: "w-6 h-6 rounded-full block",
+                                      staticClass: "w-6 h-6 block",
+                                      class: {
+                                        "rounded-full":
+                                          _vm.field.chips === true,
+                                        rounded: _vm.field.chips == "square"
+                                      },
                                       attrs: { src: item.avatar }
                                     })
                                   ])
@@ -24094,8 +24167,10 @@ var render = function() {
                           "block mt-6 font-bold":
                             !_vm.field.chips && _vm.expanded,
                           "inline-block": !_vm.field.chips && !_vm.expanded,
-                          "text-80 py-1 px-2 m-1 bg-white border border-50 rounded-full select-none cursor-pointer":
-                            _vm.field.chips
+                          "text-80 py-1 px-2 m-1 bg-white border border-50 select-none cursor-pointer":
+                            _vm.field.chips,
+                          "rounded-full": _vm.field.chips === true,
+                          rounded: _vm.field.chips == "square"
                         },
                         attrs: { tabindex: "0", "aria-role": "button" },
                         on: {
