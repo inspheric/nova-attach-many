@@ -60,74 +60,38 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-__webpack_require__(1);
-module.exports = __webpack_require__(7);
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
 
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Nova.booting(function (Vue, router, store) {
-    Vue.component('form-nova-attach-many', __webpack_require__(2));
-});
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var normalizeComponent = __webpack_require__(3)
-/* script */
-var __vue_script__ = __webpack_require__(4)
-/* template */
-var __vue_template__ = __webpack_require__(6)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources/js/components/FormField.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-c023248a", Component.options)
-  } else {
-    hotAPI.reload("data-v-c023248a", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports) {
 
 /* globals __VUE_SSR_CONTEXT__ */
@@ -236,30 +200,81 @@ module.exports = function normalizeComponent (
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(3);
+module.exports = __webpack_require__(16);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Nova.booting(function (Vue, router, store) {
+    Vue.component('form-nova-attach-many', __webpack_require__(4));
+    Vue.component('detail-nova-attach-many', __webpack_require__(13));
+});
+
+/***/ }),
 /* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(5)
+/* template */
+var __vue_template__ = __webpack_require__(12)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/components/FormField.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-c023248a", Component.options)
+  } else {
+    hotAPI.reload("data-v-c023248a", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_laravel_nova__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_laravel_nova__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_laravel_nova___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_laravel_nova__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue__);
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -390,20 +405,20 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         setInitialValue: function setInitialValue() {
             var _this = this;
 
-            var baseUrl = '/nova-vendor/nova-attach-many/';
+            this.selected = this.field.value || [];
+
+            var url = '/nova-vendor/nova-attach-many/';
 
             if (this.resourceId) {
-                Nova.request(baseUrl + this.resourceName + '/' + this.resourceId + '/attachable/' + this.field.attribute).then(function (data) {
-                    _this.selected = data.data.selected || [];
-                    _this.available = data.data.available || [];
-                    _this.loading = false;
-                });
+                url = url + this.resourceName + '/' + this.resourceId + '/attachable/' + this.field.attribute;
             } else {
-                Nova.request(baseUrl + this.resourceName + '/attachable/' + this.field.attribute).then(function (data) {
-                    _this.available = data.data.available || [];
-                    _this.loading = false;
-                });
+                url = url + this.resourceName + '/attachable/' + this.field.attribute;
             }
+
+            Nova.request(url).then(function (data) {
+                _this.available = data.data.available || [];
+                _this.loading = false;
+            });
         },
         fill: function fill(formData) {
             formData.append(this.field.attribute, this.value || []);
@@ -679,9 +694,10 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         abandon: function abandon() {
             this.abandoned = this.search && this.search.length > 0;
         },
-        unabandon: function unabandon() {
+        unabandon: function unabandon(alreadyFocused) {
             var _this6 = this;
 
+            console.log('unabandon');
             this.abandoned = false;
 
             __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
@@ -694,17 +710,21 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         selectedResources: function selectedResources() {
             var _this7 = this;
 
-            var available = this.available.filter(function (resource) {
-                return _this7.selected.includes(resource.value);
-            });
-
-            var selected = this.selected.map(function (id) {
-                return available.find(function (resource) {
-                    return resource.value == id;
+            if (this.available.length > 0) {
+                var available = this.available.filter(function (resource) {
+                    return _this7.selected.includes(resource.value);
                 });
-            });
 
-            return selected;
+                var selected = this.selected.map(function (id) {
+                    return available.find(function (resource) {
+                        return resource.value == id;
+                    });
+                });
+
+                return selected;
+            }
+
+            return [];
         },
         resources: function resources() {
             var _this8 = this;
@@ -747,7 +767,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 });
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -10974,598 +10994,18 @@ module.exports = g;
 });
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "default-field",
-    {
-      attrs: {
-        field: _vm.field,
-        "full-width-content": _vm.field.fullWidth,
-        "show-help-text": false
-      }
-    },
-    [
-      _c(
-        "template",
-        { slot: "field" },
-        [
-          _c("div", { staticClass: "border-b-0 border border-40 relative" }, [
-            _c(
-              "div",
-              {
-                staticClass:
-                  "form-input-bordered px-1 w-full ml-0 m-4 form-input-within",
-                class: { "border-danger": _vm.hasErrors }
-              },
-              [
-                _c(
-                  "div",
-                  {
-                    ref: "selectedItems",
-                    staticClass:
-                      "flex items-center flex-wrap max-h-search overflow-auto py-px cursor-text",
-                    staticStyle: { "min-height": "2.25rem" },
-                    on: {
-                      focusout: function($event) {
-                        return _vm.unfocus($event)
-                      },
-                      click: function($event) {
-                        if ($event.target !== $event.currentTarget) {
-                          return null
-                        }
-                        return _vm.unabandon($event)
-                      }
-                    }
-                  },
-                  [
-                    _vm._l(_vm.selectedResources, function(resource, $index) {
-                      return _c(
-                        "div",
-                        {
-                          key: $index,
-                          ref: "selectedItem",
-                          refInFor: true,
-                          staticClass:
-                            "flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none",
-                          class: {
-                            "bg-primary text-white": _vm.isFocused($index),
-                            "py-1 pl-2": !resource.avatar
-                          },
-                          attrs: {
-                            tabindex: _vm.isFocused($index, true) ? 0 : -1,
-                            "aria-checked": _vm.isFocused($index)
-                          },
-                          on: {
-                            mousedown: [
-                              function($event) {
-                                if (!$event.ctrlKey) {
-                                  return null
-                                }
-                                if (
-                                  $event.shiftKey ||
-                                  $event.altKey ||
-                                  $event.metaKey
-                                ) {
-                                  return null
-                                }
-                                return _vm.addFocus($event, $index)
-                              },
-                              function($event) {
-                                if (!$event.shiftKey) {
-                                  return null
-                                }
-                                return _vm.addFocus($event, $index, true)
-                              }
-                            ],
-                            click: function($event) {
-                              if (
-                                $event.ctrlKey ||
-                                $event.shiftKey ||
-                                $event.altKey ||
-                                $event.metaKey
-                              ) {
-                                return null
-                              }
-                              return _vm.focus($event, $index)
-                            },
-                            focus: function($event) {
-                              return _vm.pushFocus($event, $index)
-                            },
-                            keydown: [
-                              function($event) {
-                                if (
-                                  !$event.type.indexOf("key") &&
-                                  _vm._k(
-                                    $event.keyCode,
-                                    "delete",
-                                    [8, 46],
-                                    $event.key,
-                                    ["Backspace", "Delete", "Del"]
-                                  )
-                                ) {
-                                  return null
-                                }
-                                $event.preventDefault()
-                                return _vm.unselectFocused($event)
-                              },
-                              function($event) {
-                                if (
-                                  !$event.type.indexOf("key") &&
-                                  _vm._k(
-                                    $event.keyCode,
-                                    "left",
-                                    37,
-                                    $event.key,
-                                    ["Left", "ArrowLeft"]
-                                  )
-                                ) {
-                                  return null
-                                }
-                                if ("button" in $event && $event.button !== 0) {
-                                  return null
-                                }
-                                if (
-                                  $event.ctrlKey ||
-                                  $event.shiftKey ||
-                                  $event.altKey ||
-                                  $event.metaKey
-                                ) {
-                                  return null
-                                }
-                                return _vm.focus($event, $index, -1)
-                              },
-                              function($event) {
-                                if (
-                                  !$event.type.indexOf("key") &&
-                                  _vm._k(
-                                    $event.keyCode,
-                                    "right",
-                                    39,
-                                    $event.key,
-                                    ["Right", "ArrowRight"]
-                                  )
-                                ) {
-                                  return null
-                                }
-                                if ("button" in $event && $event.button !== 2) {
-                                  return null
-                                }
-                                if (
-                                  $event.ctrlKey ||
-                                  $event.shiftKey ||
-                                  $event.altKey ||
-                                  $event.metaKey
-                                ) {
-                                  return null
-                                }
-                                return _vm.focus($event, $index, 1)
-                              },
-                              function($event) {
-                                if (
-                                  !$event.type.indexOf("key") &&
-                                  _vm._k(
-                                    $event.keyCode,
-                                    "left",
-                                    37,
-                                    $event.key,
-                                    ["Left", "ArrowLeft"]
-                                  )
-                                ) {
-                                  return null
-                                }
-                                if ("button" in $event && $event.button !== 0) {
-                                  return null
-                                }
-                                if (!$event.shiftKey) {
-                                  return null
-                                }
-                                return _vm.moveFocus($event, -1)
-                              },
-                              function($event) {
-                                if (
-                                  !$event.type.indexOf("key") &&
-                                  _vm._k(
-                                    $event.keyCode,
-                                    "right",
-                                    39,
-                                    $event.key,
-                                    ["Right", "ArrowRight"]
-                                  )
-                                ) {
-                                  return null
-                                }
-                                if ("button" in $event && $event.button !== 2) {
-                                  return null
-                                }
-                                if (!$event.shiftKey) {
-                                  return null
-                                }
-                                return _vm.moveFocus($event, 1)
-                              }
-                            ]
-                          }
-                        },
-                        [
-                          resource.avatar
-                            ? _c("div", { staticClass: "m-px mr-2" }, [
-                                _c("img", {
-                                  staticClass: "w-6 h-6 rounded-full block",
-                                  attrs: { src: resource.avatar }
-                                })
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c("span", [_vm._v(_vm._s(resource.display))]),
-                          _vm._v(" "),
-                          _c(
-                            "span",
-                            {
-                              staticClass:
-                                "font-sans font-bolder pl-2 cursor-pointer",
-                              class: {
-                                "text-80 hover:text-black": _vm.isFocused(
-                                  $index
-                                ),
-                                "text-white-50% hover:text-white": _vm.isFocused(
-                                  $index
-                                )
-                              },
-                              on: {
-                                click: function($event) {
-                                  return _vm.unselect(
-                                    $event,
-                                    $index,
-                                    resource.value
-                                  )
-                                }
-                              }
-                            },
-                            [_vm._v("×")]
-                          )
-                        ]
-                      )
-                    }),
-                    _vm._v(" "),
-                    _vm.abandoned
-                      ? _c(
-                          "div",
-                          {
-                            staticClass:
-                              "py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex",
-                            attrs: { tabindex: "0" },
-                            on: { click: _vm.unabandon }
-                          },
-                          [
-                            _c("span", [_vm._v(_vm._s(_vm.search))]),
-                            _vm._v(" "),
-                            _c(
-                              "span",
-                              {
-                                staticClass:
-                                  "font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white",
-                                on: { click: _vm.newSearch }
-                              },
-                              [_vm._v("×")]
-                            )
-                          ]
-                        )
-                      : _vm._e(),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "show",
-                          rawName: "v-show",
-                          value: !_vm.abandoned,
-                          expression: "!abandoned"
-                        },
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.search,
-                          expression: "search"
-                        }
-                      ],
-                      ref: "search",
-                      staticClass:
-                        "outline-none search-input-input py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size",
-                      staticStyle: { "min-width": "2rem" },
-                      attrs: {
-                        disabled: _vm.disabled,
-                        type: "text",
-                        spellcheck: "false"
-                      },
-                      domProps: { value: _vm.search },
-                      on: {
-                        keydown: [
-                          function($event) {
-                            if (
-                              !$event.type.indexOf("key") &&
-                              _vm._k($event.keyCode, "esc", 27, $event.key, [
-                                "Esc",
-                                "Escape"
-                              ])
-                            ) {
-                              return null
-                            }
-                            $event.preventDefault()
-                            return _vm.clearSearch($event)
-                          },
-                          function($event) {
-                            if (
-                              !$event.type.indexOf("key") &&
-                              _vm._k($event.keyCode, "left", 37, $event.key, [
-                                "Left",
-                                "ArrowLeft"
-                              ])
-                            ) {
-                              return null
-                            }
-                            if ("button" in $event && $event.button !== 0) {
-                              return null
-                            }
-                            return _vm.focusBack($event)
-                          },
-                          function($event) {
-                            if (
-                              !$event.type.indexOf("key") &&
-                              _vm._k(
-                                $event.keyCode,
-                                "delete",
-                                [8, 46],
-                                $event.key,
-                                ["Backspace", "Delete", "Del"]
-                              )
-                            ) {
-                              return null
-                            }
-                            return _vm.deleteBack($event)
-                          },
-                          function($event) {
-                            if (
-                              !$event.type.indexOf("key") &&
-                              _vm._k(
-                                $event.keyCode,
-                                "enter",
-                                13,
-                                $event.key,
-                                "Enter"
-                              )
-                            ) {
-                              return null
-                            }
-                            $event.preventDefault()
-                          }
-                        ],
-                        blur: _vm.abandon,
-                        focus: function($event) {
-                          _vm.abandoned = false
-                        },
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.search = $event.target.value
-                        }
-                      }
-                    })
-                  ],
-                  2
-                )
-              ]
-            )
-          ]),
-          _vm._v(" "),
-          _c(
-            "div",
-            {
-              staticClass: "border border-40 relative overflow-auto",
-              style: { height: _vm.field.height }
-            },
-            [
-              _vm.loading
-                ? _c(
-                    "div",
-                    {
-                      staticClass:
-                        "flex justify-center items-center absolute pin z-50 bg-white"
-                    },
-                    [_c("loader", { staticClass: "text-60" })],
-                    1
-                  )
-                : _vm._l(_vm.resources, function(resource) {
-                    return _c(
-                      "div",
-                      {
-                        key: resource.value,
-                        staticClass:
-                          "flex items-center py-3 cursor-pointer select-none hover:bg-30",
-                        on: {
-                          click: function($event) {
-                            return _vm.toggle($event, resource.value)
-                          }
-                        }
-                      },
-                      [
-                        _c(
-                          "div",
-                          { staticClass: "w-16 flex justify-center" },
-                          [
-                            _c("fake-checkbox", {
-                              attrs: {
-                                checked: _vm.selected.includes(resource.value)
-                              }
-                            })
-                          ],
-                          1
-                        ),
-                        _vm._v(" "),
-                        resource.avatar
-                          ? _c("div", { staticClass: "mr-3" }, [
-                              _c("img", {
-                                staticClass: "w-8 h-8 rounded-full block",
-                                attrs: { src: resource.avatar }
-                              })
-                            ])
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _c("span", { staticClass: "flex-no-grow" }, [
-                          _vm._v(_vm._s(resource.display))
-                        ])
-                      ]
-                    )
-                  })
-            ],
-            2
-          ),
-          _vm._v(" "),
-          _vm.hasErrors
-            ? _c("help-text", { staticClass: "error-text mt-2 text-danger" }, [
-                _vm._v("\n            " + _vm._s(_vm.firstError) + "\n        ")
-              ])
-            : _vm._e(),
-          _vm._v(" "),
-          _c(
-            "div",
-            {
-              staticClass: "help-text mt-3 w-full flex",
-              class: { invisible: _vm.loading }
-            },
-            [
-              _vm.field.showCounts
-                ? _c(
-                    "span",
-                    {
-                      staticClass: "pr-2 border-60 whitespace-no-wrap",
-                      class: { "border-r mr-2": _vm.field.helpText }
-                    },
-                    [
-                      _vm._v(
-                        "\n                " +
-                          _vm._s(_vm.selected.length) +
-                          " / " +
-                          _vm._s(_vm.available.length) +
-                          "\n            "
-                      )
-                    ]
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _c(
-                "span",
-                {
-                  staticClass: "border-60",
-                  class: { "border-r mr-2 pr-2": _vm.field.showPreview }
-                },
-                [
-                  _vm.field.helpText
-                    ? _c("help-text", { staticClass: "help-text" }, [
-                        _vm._v(" " + _vm._s(_vm.field.helpText) + " ")
-                      ])
-                    : _vm._e()
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _vm.field.showPreview
-                ? _c(
-                    "span",
-                    {
-                      staticClass: "flex cursor-pointer select-none",
-                      on: {
-                        click: function($event) {
-                          return _vm.togglePreview($event)
-                        }
-                      }
-                    },
-                    [
-                      _c("fake-checkbox", {
-                        staticClass: "flex",
-                        attrs: { checked: _vm.preview }
-                      }),
-                      _vm._v(" "),
-                      _c("span", { staticClass: "pl-2" }, [
-                        _vm._v(_vm._s(_vm.__("Show selected only")))
-                      ])
-                    ],
-                    1
-                  )
-                : _vm._e()
-            ]
-          )
-        ],
-        1
-      )
-    ],
-    2
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-c023248a", module.exports)
-  }
-}
-
-/***/ }),
 /* 7 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 if (false) {
   module.exports = require('./vue.common.prod.js')
 } else {
-  module.exports = __webpack_require__(14)
+  module.exports = __webpack_require__(8)
 }
 
 
 /***/ }),
-/* 14 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23508,10 +22948,10 @@ Vue.compile = compileToFunctions;
 
 module.exports = Vue;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(15).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(9).setImmediate))
 
 /***/ }),
-/* 15 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -23567,7 +23007,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(16);
+__webpack_require__(10);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -23578,10 +23018,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 16 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -23771,10 +23211,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(17)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(11)))
 
 /***/ }),
-/* 17 */
+/* 11 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -23962,6 +23402,765 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "default-field",
+    {
+      attrs: {
+        field: _vm.field,
+        "full-width-content": _vm.field.fullWidth,
+        "show-help-text": false
+      }
+    },
+    [
+      _c(
+        "template",
+        { slot: "field" },
+        [
+          _c(
+            "div",
+            {
+              staticClass: "form-input-bordered px-1 w-full form-input-within",
+              class: { "border-danger": _vm.hasErrors }
+            },
+            [
+              _c(
+                "div",
+                {
+                  ref: "selectedItems",
+                  staticClass:
+                    "flex items-center flex-wrap max-h-search overflow-auto py-px cursor-text",
+                  staticStyle: { "min-height": "2.25rem" },
+                  on: {
+                    focusout: function($event) {
+                      return _vm.unfocus($event)
+                    },
+                    click: function($event) {
+                      if ($event.target !== $event.currentTarget) {
+                        return null
+                      }
+                      return _vm.unabandon($event)
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.selectedResources, function(resource, $index) {
+                    return _c(
+                      "div",
+                      {
+                        key: $index,
+                        ref: "selectedItem",
+                        refInFor: true,
+                        staticClass:
+                          "flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none",
+                        class: {
+                          "bg-primary text-white": _vm.isFocused($index),
+                          "py-1 pl-2": !resource.avatar
+                        },
+                        attrs: {
+                          tabindex: _vm.isFocused($index, true) ? 0 : -1,
+                          "aria-checked": _vm.isFocused($index)
+                        },
+                        on: {
+                          mousedown: [
+                            function($event) {
+                              if (!$event.ctrlKey) {
+                                return null
+                              }
+                              if (
+                                $event.shiftKey ||
+                                $event.altKey ||
+                                $event.metaKey
+                              ) {
+                                return null
+                              }
+                              return _vm.addFocus($event, $index)
+                            },
+                            function($event) {
+                              if (!$event.shiftKey) {
+                                return null
+                              }
+                              return _vm.addFocus($event, $index, true)
+                            }
+                          ],
+                          click: function($event) {
+                            if (
+                              $event.ctrlKey ||
+                              $event.shiftKey ||
+                              $event.altKey ||
+                              $event.metaKey
+                            ) {
+                              return null
+                            }
+                            return _vm.focus($event, $index)
+                          },
+                          focus: function($event) {
+                            return _vm.pushFocus($event, $index)
+                          },
+                          keydown: [
+                            function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k(
+                                  $event.keyCode,
+                                  "delete",
+                                  [8, 46],
+                                  $event.key,
+                                  ["Backspace", "Delete", "Del"]
+                                )
+                              ) {
+                                return null
+                              }
+                              $event.preventDefault()
+                              return _vm.unselectFocused($event)
+                            },
+                            function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k($event.keyCode, "left", 37, $event.key, [
+                                  "Left",
+                                  "ArrowLeft"
+                                ])
+                              ) {
+                                return null
+                              }
+                              if ("button" in $event && $event.button !== 0) {
+                                return null
+                              }
+                              if (
+                                $event.ctrlKey ||
+                                $event.shiftKey ||
+                                $event.altKey ||
+                                $event.metaKey
+                              ) {
+                                return null
+                              }
+                              return _vm.focus($event, $index, -1)
+                            },
+                            function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k(
+                                  $event.keyCode,
+                                  "right",
+                                  39,
+                                  $event.key,
+                                  ["Right", "ArrowRight"]
+                                )
+                              ) {
+                                return null
+                              }
+                              if ("button" in $event && $event.button !== 2) {
+                                return null
+                              }
+                              if (
+                                $event.ctrlKey ||
+                                $event.shiftKey ||
+                                $event.altKey ||
+                                $event.metaKey
+                              ) {
+                                return null
+                              }
+                              return _vm.focus($event, $index, 1)
+                            },
+                            function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k($event.keyCode, "left", 37, $event.key, [
+                                  "Left",
+                                  "ArrowLeft"
+                                ])
+                              ) {
+                                return null
+                              }
+                              if ("button" in $event && $event.button !== 0) {
+                                return null
+                              }
+                              if (!$event.shiftKey) {
+                                return null
+                              }
+                              return _vm.moveFocus($event, -1)
+                            },
+                            function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k(
+                                  $event.keyCode,
+                                  "right",
+                                  39,
+                                  $event.key,
+                                  ["Right", "ArrowRight"]
+                                )
+                              ) {
+                                return null
+                              }
+                              if ("button" in $event && $event.button !== 2) {
+                                return null
+                              }
+                              if (!$event.shiftKey) {
+                                return null
+                              }
+                              return _vm.moveFocus($event, 1)
+                            }
+                          ]
+                        }
+                      },
+                      [
+                        resource.avatar
+                          ? _c("div", { staticClass: "m-px mr-2" }, [
+                              _c("img", {
+                                staticClass: "w-6 h-6 rounded-full block",
+                                attrs: { src: resource.avatar }
+                              })
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _c("span", [_vm._v(_vm._s(resource.display))]),
+                        _vm._v(" "),
+                        _c(
+                          "span",
+                          {
+                            staticClass:
+                              "font-sans font-bolder pl-2 cursor-pointer",
+                            class: {
+                              "text-80 hover:text-black": _vm.isFocused($index),
+                              "text-white-50% hover:text-white": _vm.isFocused(
+                                $index
+                              )
+                            },
+                            on: {
+                              click: function($event) {
+                                return _vm.unselect(
+                                  $event,
+                                  $index,
+                                  resource.value
+                                )
+                              }
+                            }
+                          },
+                          [_vm._v("×")]
+                        )
+                      ]
+                    )
+                  }),
+                  _vm._v(" "),
+                  _vm.abandoned
+                    ? _c(
+                        "div",
+                        {
+                          staticClass:
+                            "py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex",
+                          attrs: { tabindex: "0" },
+                          on: { click: _vm.unabandon }
+                        },
+                        [
+                          _c("span", [_vm._v(_vm._s(_vm.search))]),
+                          _vm._v(" "),
+                          _c(
+                            "span",
+                            {
+                              staticClass:
+                                "font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white",
+                              on: { click: _vm.newSearch }
+                            },
+                            [_vm._v("×")]
+                          )
+                        ]
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: !_vm.abandoned,
+                        expression: "!abandoned"
+                      },
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.search,
+                        expression: "search"
+                      }
+                    ],
+                    ref: "search",
+                    staticClass:
+                      "outline-none search-input-input py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size",
+                    staticStyle: { "min-width": "2rem" },
+                    attrs: {
+                      disabled: _vm.disabled,
+                      type: "text",
+                      spellcheck: "false"
+                    },
+                    domProps: { value: _vm.search },
+                    on: {
+                      keydown: [
+                        function($event) {
+                          if (
+                            !$event.type.indexOf("key") &&
+                            _vm._k($event.keyCode, "esc", 27, $event.key, [
+                              "Esc",
+                              "Escape"
+                            ])
+                          ) {
+                            return null
+                          }
+                          $event.preventDefault()
+                          return _vm.clearSearch($event)
+                        },
+                        function($event) {
+                          if (
+                            !$event.type.indexOf("key") &&
+                            _vm._k($event.keyCode, "left", 37, $event.key, [
+                              "Left",
+                              "ArrowLeft"
+                            ])
+                          ) {
+                            return null
+                          }
+                          if ("button" in $event && $event.button !== 0) {
+                            return null
+                          }
+                          return _vm.focusBack($event)
+                        },
+                        function($event) {
+                          if (
+                            !$event.type.indexOf("key") &&
+                            _vm._k(
+                              $event.keyCode,
+                              "delete",
+                              [8, 46],
+                              $event.key,
+                              ["Backspace", "Delete", "Del"]
+                            )
+                          ) {
+                            return null
+                          }
+                          return _vm.deleteBack($event)
+                        },
+                        function($event) {
+                          if (
+                            !$event.type.indexOf("key") &&
+                            _vm._k(
+                              $event.keyCode,
+                              "enter",
+                              13,
+                              $event.key,
+                              "Enter"
+                            )
+                          ) {
+                            return null
+                          }
+                          $event.preventDefault()
+                        }
+                      ],
+                      blur: _vm.abandon,
+                      focus: function($event) {
+                        _vm.abandoned = false
+                      },
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.search = $event.target.value
+                      }
+                    }
+                  })
+                ],
+                2
+              )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "border border-40 relative overflow-auto",
+              staticStyle: { height: "400px" }
+            },
+            [
+              _vm.loading
+                ? _c(
+                    "div",
+                    {
+                      staticClass:
+                        "flex justify-center items-center absolute pin z-50 bg-white"
+                    },
+                    [_c("loader", { staticClass: "text-60" })],
+                    1
+                  )
+                : _vm._l(_vm.resources, function(resource) {
+                    return _c(
+                      "div",
+                      {
+                        key: resource.value,
+                        staticClass:
+                          "flex items-center py-3 cursor-pointer select-none hover:bg-30",
+                        on: {
+                          click: function($event) {
+                            return _vm.toggle($event, resource.value)
+                          }
+                        }
+                      },
+                      [
+                        _c(
+                          "div",
+                          {
+                            staticClass:
+                              "w-16 flex justify-center flex-no-shrink"
+                          },
+                          [
+                            _c("fake-checkbox", {
+                              attrs: {
+                                checked: _vm.selected.includes(resource.value)
+                              }
+                            })
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        resource.avatar
+                          ? _c("div", { staticClass: "mr-3 flex-no-shrink" }, [
+                              _c("img", {
+                                staticClass: "w-8 h-8 rounded-full block",
+                                attrs: { src: resource.avatar }
+                              })
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "flex-no-grow" }, [
+                          _vm._v(_vm._s(resource.display))
+                        ])
+                      ]
+                    )
+                  })
+            ],
+            2
+          ),
+          _vm._v(" "),
+          _vm.hasErrors
+            ? _c("help-text", { staticClass: "error-text mt-2 text-danger" }, [
+                _vm._v("\n            " + _vm._s(_vm.firstError) + "\n        ")
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.field.helpText
+            ? _c("help-text", { staticClass: "help-text" }, [
+                _vm._v(_vm._s(_vm.field.helpText))
+              ])
+            : _vm._e()
+        ],
+        1
+      )
+    ],
+    2
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-c023248a", module.exports)
+  }
+}
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(14)
+/* template */
+var __vue_template__ = __webpack_require__(15)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/components/DetailField.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-0224618e", Component.options)
+  } else {
+    hotAPI.reload("data-v-0224618e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['resource', 'resourceName', 'resourceId', 'field'],
+
+    data: function data() {
+        return {
+            expanded: false
+        };
+    },
+
+    methods: {
+        toggle: function toggle() {
+            this.expanded = !this.expanded;
+        }
+    },
+
+    computed: {
+        limitedItems: function limitedItems() {
+            var related = this.field.related || [];
+
+            if (this.field.limit && !this.expanded && this.field.limit > 0) {
+                related = related.slice(0, this.field.limit);
+            }
+
+            return related;
+        },
+        isLimited: function isLimited() {
+            return this.field.limit && this.field.limit > 0 && this.field.related.length > this.field.limit;
+        },
+        showHideLabel: function showHideLabel() {
+            return !this.expanded ? this.__('and :count more...', { count: this.field.related.length - this.field.limit }) : this.__('Show Less');
+        }
+    }
+});
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "panel-item",
+    { attrs: { field: _vm.field } },
+    [
+      _c("template", { slot: "value" }, [
+        _vm.field.related
+          ? _c(
+              "div",
+              { class: { "flex items-start flex-wrap": _vm.field.chips } },
+              [
+                _vm._l(_vm.limitedItems, function(item, $index) {
+                  return _c(
+                    "span",
+                    [
+                      item.viewable && item.display
+                        ? _c(
+                            "router-link",
+                            {
+                              staticClass: "dim no-underline",
+                              class: {
+                                "flex items-center m-1 pr-3 bg-30 rounded-full select-none cursor-pointer text-80":
+                                  _vm.field.chips,
+                                "py-1 pl-2": _vm.field.chips && !item.avatar,
+                                "font-bold text-primary": !_vm.field.chips
+                              },
+                              attrs: {
+                                to: {
+                                  name: "detail",
+                                  params: {
+                                    resourceName: _vm.field.resourceName,
+                                    resourceId: item.value
+                                  }
+                                }
+                              }
+                            },
+                            [
+                              _vm.field.chips && item.avatar
+                                ? _c("div", { staticClass: "m-px mr-2" }, [
+                                    _c("img", {
+                                      staticClass: "w-6 h-6 rounded-full block",
+                                      attrs: { src: item.avatar }
+                                    })
+                                  ])
+                                : _vm._e(),
+                              _vm._v(
+                                "\n                    " + _vm._s(item.display)
+                              )
+                            ]
+                          )
+                        : item.display
+                        ? _c("span", { staticClass: "font-bold" }, [
+                            _vm._v(_vm._s(item.display))
+                          ])
+                        : _vm._e(),
+                      !_vm.field.chips && $index < _vm.limitedItems.length - 1
+                        ? _c("span", [_vm._v(", ")])
+                        : _vm._e()
+                    ],
+                    1
+                  )
+                }),
+                !_vm.field.chips && _vm.isLimited && !_vm.expanded
+                  ? _c("span", [_vm._v(", ")])
+                  : _vm._e(),
+                _vm.isLimited
+                  ? _c(
+                      "a",
+                      {
+                        staticClass: "cursor-pointer",
+                        class: {
+                          "text-primary dim": !_vm.field.chips,
+                          "block mt-6 font-bold":
+                            !_vm.field.chips && _vm.expanded,
+                          "inline-block": !_vm.field.chips && !_vm.expanded,
+                          "text-80 py-1 px-2 m-1 bg-white border border-50 rounded-full select-none cursor-pointer":
+                            _vm.field.chips
+                        },
+                        attrs: { tabindex: "0", "aria-role": "button" },
+                        on: {
+                          click: _vm.toggle,
+                          keyup: [
+                            function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k(
+                                  $event.keyCode,
+                                  "enter",
+                                  13,
+                                  $event.key,
+                                  "Enter"
+                                )
+                              ) {
+                                return null
+                              }
+                              return _vm.toggle($event)
+                            },
+                            function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k(
+                                  $event.keyCode,
+                                  "space",
+                                  32,
+                                  $event.key,
+                                  [" ", "Spacebar"]
+                                )
+                              ) {
+                                return null
+                              }
+                              return _vm.toggle($event)
+                            }
+                          ]
+                        }
+                      },
+                      [_vm._v(_vm._s(_vm.showHideLabel))]
+                    )
+                  : _vm._e()
+              ],
+              2
+            )
+          : _c("p", [_vm._v("—")])
+      ])
+    ],
+    2
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-0224618e", module.exports)
+  }
+}
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);

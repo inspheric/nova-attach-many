@@ -16,21 +16,27 @@ class AttachMany extends Field
     use Authorizable;
     use FormatsRelatableDisplayValues;
 
-    public $height = '300px';
-
-    public $fullWidth = false;
-
-    public $showToolbar = true;
-
-    public $showCounts = false;
-
-    public $showPreview = false;
-
     public $showOnIndex = false;
 
-    public $showOnDetail = false;
+    public $showOnDetail = true;
 
     public $component = 'nova-attach-many';
+
+    /**
+     * Indicates if the related resource can be viewed.
+     *
+     * @var bool
+     */
+    public $viewable = true;
+
+    public $related = [];
+
+    /**
+     * Indicates the maximum number of items to show on the detail view.
+     *
+     * @var bool
+     */
+    public $limit;
 
     /**
      * The column that should be displayed for the field.
@@ -75,13 +81,31 @@ class AttachMany extends Field
 
     public function resolve($resource, $attribute = null)
     {
-        $this->withMeta([
-            'height' => $this->height,
-            'fullWidth' => $this->fullWidth,
-            'showCounts' => $this->showCounts,
-            'showPreview' => $this->showPreview,
-            'showToolbar' => $this->showToolbar
-        ]);
+        $results = null;
+
+        if ($resource->relationLoaded($this->attribute)) {
+            $results = $resource->getRelation($this->attribute);
+        }
+
+        if (! $results) {
+            $results = $resource->{$this->attribute}()->withoutGlobalScopes()->getResults(); //FIXME
+        }
+
+        $this->value = $results->map->getKey();
+
+        $this->related = $results->map(function($value) {
+
+            $resource = new $this->resourceClass($value);
+            $request = app(NovaRequest::class);
+
+            return [
+                'value' => $value->getKey(),
+                'display' => $this->formatDisplayValue($resource),
+                'avatar' => $resource->resolveAvatarUrl($request),
+                'viewable' => $this->viewable && $resource->authorizedToView($request),
+            ];
+
+        });
     }
 
     public function authorize(Request $request)
@@ -99,37 +123,40 @@ class AttachMany extends Field
             && parent::authorize($request);
     }
 
-    public function height($height)
+    /**
+     * Specify if the related resource can be viewed.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function viewable($value = true)
     {
-        $this->height = $height;
+        $this->viewable = $value;
 
         return $this;
     }
 
-    public function fullWidth($fullWidth = true)
+    /**
+     * Specify the maximum number of items to display on the detail view.
+     *
+     * @param  int  $limit
+     * @return $this
+     */
+    public function limit(int $limit = 5)
     {
-        $this->fullWidth = $fullWidth;
+        $this->limit = $limit;
 
         return $this;
     }
 
-    public function hideToolbar()
+    /**
+     * Specify that all items should be displayed on the detail view.
+     *
+     * @return $this
+     */
+    public function unlimited()
     {
-        $this->showToolbar = false;
-
-        return $this;
-    }
-
-    public function showCounts($showCounts = true)
-    {
-        $this->showCounts = $showCounts;
-
-        return $this;
-    }
-
-    public function showPreview($showPreview = true)
-    {
-        $this->showPreview = $showPreview;
+        $this->limit = 0;
 
         return $this;
     }
@@ -137,5 +164,21 @@ class AttachMany extends Field
     public function publicFormatDisplayValue($resource)
     {
         return $this->formatDisplayValue($resource);
+    }
+
+    /**
+     * Get additional meta information to merge with the field payload.
+     *
+     * @return array
+     */
+    public function meta()
+    {
+        return array_merge([
+            'chips' => true,
+            'related' => $this->related,
+            'limit' => $this->limit,
+            'resourceName' => $this->resourceName,
+            'viewable' => $this->viewable,
+        ], $this->meta);
     }
 }

@@ -4,8 +4,7 @@
             <!-- <div @click="selectAll" class="w-16 text-center flex justify-center items-center">
                 <fake-checkbox :checked="selectingAll" class="cursor-pointer" :title="__('Select All')"></fake-checkbox>
             </div> -->
-            <div class="border-b-0 border border-40 relative">
-                <div class="form-input-bordered px-1 w-full ml-0 m-4 form-input-within" :class="{ 'border-danger': hasErrors }">
+                <div class="form-input-bordered px-1 w-full form-input-within" :class="{ 'border-danger': hasErrors }">
                     <div
                         class="flex items-center flex-wrap max-h-search overflow-auto py-px cursor-text"
                         style="min-height: 2.25rem;"
@@ -78,16 +77,15 @@
                         />
                     </div>
                 </div>
-            </div>
-            <div class="border border-40 relative overflow-auto" :style="{ height: field.height }">
+            <div class="border border-40 relative overflow-auto" style="height: 400px">  <!-- FIXME -->
                 <div v-if="loading" class="flex justify-center items-center absolute pin z-50 bg-white">
                     <loader class="text-60" />
                 </div>
                 <div v-else v-for="resource in resources" :key="resource.value" @click="toggle($event, resource.value)" class="flex items-center py-3 cursor-pointer select-none hover:bg-30">
-                    <div class="w-16 flex justify-center">
+                    <div class="w-16 flex justify-center flex-no-shrink">
                         <fake-checkbox :checked="selected.includes(resource.value)" />
                     </div>
-                    <div v-if="resource.avatar" class="mr-3">
+                    <div v-if="resource.avatar" class="mr-3 flex-no-shrink">
                         <img :src="resource.avatar" class="w-8 h-8 rounded-full block" />
                     </div>
                     <span class="flex-no-grow">{{ resource.display }}</span>
@@ -98,18 +96,7 @@
                 {{ firstError }}
             </help-text>
 
-            <div class="help-text mt-3 w-full flex" :class="{ 'invisible': loading }">
-                <span v-if="field.showCounts" class="pr-2 border-60 whitespace-no-wrap" :class="{ 'border-r mr-2': field.helpText }">
-                    {{ selected.length  }} / {{ available.length }}
-                </span>
-                <span class="border-60" :class="{'border-r mr-2 pr-2': field.showPreview }">
-                    <help-text class="help-text" v-if="field.helpText"> {{ field.helpText }} </help-text>
-                </span>
-                <span v-if="field.showPreview" @click="togglePreview($event)" class="flex cursor-pointer select-none">
-                    <fake-checkbox class="flex" :checked="preview" />
-                    <span class="pl-2">{{ __('Show selected only') }}</span>
-                </span>
-            </div>
+            <help-text class="help-text" v-if="field.helpText">{{ field.helpText }}</help-text>
 
         </template>
     </default-field>
@@ -139,24 +126,22 @@ export default {
     methods: {
         setInitialValue() {
 
-            let baseUrl = '/nova-vendor/nova-attach-many/';
+            this.selected = this.field.value || []
+
+            let url = '/nova-vendor/nova-attach-many/';
 
             if(this.resourceId) {
-                Nova.request(baseUrl + this.resourceName + '/' + this.resourceId + '/attachable/' + this.field.attribute)
-                    .then((data) => {
-                        this.selected = data.data.selected || []
-                        this.available = data.data.available || []
-                        this.loading = false;
-                    });
+                url = url + this.resourceName + '/' + this.resourceId + '/attachable/' + this.field.attribute
             }
             else {
-                Nova.request(baseUrl + this.resourceName + '/attachable/' + this.field.attribute)
-                    .then((data) => {
-                        this.available = data.data.available || []
-                        this.loading = false
-                    })
+                url = url + this.resourceName + '/attachable/' + this.field.attribute
             }
 
+            Nova.request(url)
+                .then((data) => {
+                    this.available = data.data.available || []
+                    this.loading = false;
+                });
         },
 
         fill(formData) {
@@ -447,7 +432,8 @@ export default {
             this.abandoned = this.search && this.search.length > 0
         },
 
-        unabandon() {
+        unabandon(alreadyFocused) {
+            console.log('unabandon')
             this.abandoned = false
 
             Vue.nextTick(() => {
@@ -458,17 +444,21 @@ export default {
     },
     computed: {
         selectedResources: function() {
-            let available = this.available.filter((resource) => {
-                return this.selected.includes(resource.value)
-            })
-
-            let selected = this.selected.map((id) => {
-                return available.find((resource) => {
-                    return resource.value == id
+            if (this.available.length > 0) {
+                let available = this.available.filter((resource) => {
+                    return this.selected.includes(resource.value)
                 })
-            })
 
-            return selected
+                let selected = this.selected.map((id) => {
+                    return available.find((resource) => {
+                        return resource.value == id
+                    })
+                })
+
+                return selected
+            }
+
+            return []
         },
         resources: function() {
             if(this.preview) {

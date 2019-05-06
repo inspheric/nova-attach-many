@@ -18,7 +18,6 @@ class AttachController extends Controller
     public function edit(NovaRequest $request, $parent, $parentId, $relationship)
     {
         return [
-            'selected' => $request->findResourceOrFail()->model()->{$relationship}->pluck('id'),
             'available' => $this->getAvailableResources($request, $relationship),
         ];
     }
