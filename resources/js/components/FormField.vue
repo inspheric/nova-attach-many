@@ -15,28 +15,34 @@
                     </div> -->
                 </div>
                 <div class="border-b-0 border border-40 relative">
-                    <div class="form-input-bordered px-1 w-full ml-0 m-4" style="min-height: 2.25rem;">
-                        <div class="flex flex-wrap max-h-search overflow-auto">
+                    <div class="form-input-bordered px-1 w-full ml-0 m-4">
+                        <div class="flex items-center flex-wrap max-h-search overflow-auto" style="min-height: 2.25rem;" @focusout="unfocus">
                             <div v-for="(resource, $index) in selectedResources"
                                 :key="$index"
-                                :tabindex="(focused($index, 0)) || (focused.length == 0 && $index === 0) ? 0 : -1"
-                                :aria-checked="focused($index)"
+                                :tabindex="isFocused($index, true) ? 0 : -1"
+                                :aria-checked="isFocused($index)"
                                 ref="selectedItem"
-                                class="flex py-1 px-2 m-1 bg-30 rounded-full select-none cursor-pointer outline-none"
-                                :class="{ 'bg-primary text-white': focused($index) }"
-                                @click="focus($event, $index)"
+                                class="flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none focus:bg-info"
+                                :class="{ 'bg-primary text-white': isFocused($index), 'py-1 px-2': !resource.avatar }"
+                                @click.ctrl.exact="addFocus($event, $index)"
+                                @click.shift="addFocus($event, $index, true)"
+                                @click.exact="focus($event, $index)"
                                 @focus="focused = [$index]"
-                                @blur="focused = []"
-                                @keydown.delete.prevent="unselect($event, $index, resource.value)"
-                                @keydown.left.prevent="focus($event, $index, -1)"
-                                @keydown.right.prevent="focus($event, $index, 1)"
+                                @keydown.delete.prevent="unselectFocused($event)"
+                                @keydown.left.exact="focus($event, $index, -1)"
+                                @keydown.right.exact="focus($event, $index, 1)"
+                                @keydown.left.shift="moveFocus($event, -1)"
+                                @keydown.right.shift="moveFocus($event, 1)"
                             >
+                                <div v-if="resource.avatar" class="m-px mr-2">
+                                    <img :src="resource.avatar" class="w-4 h-4 rounded-full block" />
+                                </div>
                                 <span>{{ resource.display }}</span>
                                 <span @click="unselect($event, $index, resource.value)"
                                     class="font-sans font-bolder pl-2 cursor-pointer"
                                     :class="{
-                                        'text-80 hover:text-black': focused($index),
-                                        'text-white-50% hover:text-white': focused($index)
+                                        'text-80 hover:text-black': isFocused($index),
+                                        'text-white-50% hover:text-white': isFocused($index)
                                         }"
                                 >x</span>
                             </div>
@@ -47,9 +53,9 @@
                             @keydown.down.prevent="move(1)"
                             @keydown.up.prevent="move(-1)" -->
                             <div
+                                v-if="abandoned"
                                 tabindex="0"
-                                class="py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none hidden"
-                                :class="{ 'flex': abandoned }"
+                                class="py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex"
                                 @click="unabandon"
                             >
                                 <span>{{ search }}</span>
@@ -58,6 +64,7 @@
                                 >x</span>
                             </div>
                             <input
+                                v-show="!abandoned"
                                 :disabled="disabled"
                                 v-model="search"
                                 @keydown.esc.prevent="clearSearch"
@@ -66,8 +73,7 @@
                                 @blur="abandon"
                                 @focus="abandoned = false"
                                 ref="search"
-                                class="outline-none search-input-input px-1 py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1"
-                                :class="{ 'hidden': abandoned }"
+                                class="outline-none search-input-input px-1 py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size"
                                 type="text"
                                 spellcheck="false"
                                 style="min-width: 2rem;"
@@ -79,11 +85,14 @@
                     <div v-if="loading" class="flex justify-center items-center absolute pin z-50 bg-white">
                         <loader class="text-60" />
                     </div>
-                    <div v-else v-for="resource in resources" :key="resource.value" @click="toggle($event, resource.value)" class="flex py-3 cursor-pointer select-none hover:bg-30">
+                    <div v-else v-for="resource in resources" :key="resource.value" @click="toggle($event, resource.value)" class="flex items-center py-3 cursor-pointer select-none hover:bg-30">
                         <div class="w-16 flex justify-center">
                             <fake-checkbox :checked="selected.includes(resource.value)" />
                         </div>
-                        <span>{{ resource.display }}</span>
+                        <div v-if="resource.avatar" class="mr-3">
+                            <img :src="resource.avatar" class="w-8 h-8 rounded-full block" />
+                        </div>
+                        <span class="flex-no-grow">{{ resource.display }}</span>
                     </div>
                 </div>
             </div>
@@ -171,6 +180,7 @@ export default {
         },
 
         focus(event, index, offset) {
+
             if (offset < 0) {
                 if (index > 0) {
                     index = index + offset
@@ -188,28 +198,122 @@ export default {
                 }
             }
 
-            this.focused = index
+            this.focused = [index]
+
+            console.log('focus', this.focused)
         },
 
-        focused(index, only) {
+        unfocus() {
+            this.focused = []
+        },
+
+        isFocused(index, only) {
             if (only) {
-                return this.focused == [index]
+                return this.focused[0] === index
             }
             return this.focused.includes(index)
+        },
+
+        addFocus(event, index, join) {
+
+            let focused = this.focused || []
+
+            if (join) {
+                if (focused.length == 0) {
+                    this.focused = [index]
+                    console.log('addFocus-only', this.focused)
+                    return
+                }
+
+                let lowestIndex = Math.min(...focused)
+
+                for (let i = lowestIndex; i <= index; i++) {
+                    this.focused.push(i)
+                }
+            }
+            else {
+                focused.push(index)
+            }
+
+            this.focused = focused.filter((value, index, self) => {
+                return self.indexOf(value) === index
+            })
+            // .sort()
+
+            console.log('addFocus', this.focused)
+        },
+
+        moveFocus(event, offset) {
+            let focused = this.focused || []
+
+            const lowestIndex = Math.min(...focused)
+            const highestIndex = Math.max(...focused)
+            const firstIndex = focused[0]
+
+            if (offset < 0) { // Move left
+                if (lowestIndex <= firstIndex && highestIndex == firstIndex) { // Move start left
+                    if (lowestIndex > 0) {
+                        focused.push(lowestIndex - 1)
+                    }
+                }
+                else { // Move end left
+                    focused.pop()
+                }
+            }
+            else if (offset > 0) { // Move right
+                if (highestIndex >= firstIndex && lowestIndex == firstIndex) { // Move end right
+                    if (highestIndex < this.selected.length - 1) {
+                        focused.push(highestIndex + 1)
+                    }
+                }
+                else { // Move start right
+                    focused.pop()
+                }
+            }
+
+            this.focused = focused.filter((value, index, self) => {
+                return self.indexOf(value) === index
+            })
         },
 
         focusBack(event) {
             if(event.target.selectionStart == 0 && this.selected.length > 0) {
                 let index = this.selected.length - 1
                 this.$refs.selectedItem[index].focus()
-                this.focused = index
+                this.focused = [index]
             }
         },
 
         deleteBack(event) {
             if((this.search == null || this.search.length == 0) && event.key == 'Backspace' && this.selected.length > 0) {
-                this.selected.pop()
+                this.$emit('unselected', this.selected.pop())
             }
+        },
+
+        unselectFocused(event) {
+
+            let focused = this.focused || []
+            focused = focused.map(index => this.selected[index])
+
+            this.selected = this.selected.filter(selectedId => !focused.includes(selectedId))
+            this.$emit('unselected', focused)
+
+            let index = Math.min(...this.focused)
+
+            Vue.nextTick(() => {
+                if (event.key == 'Backspace' && index > 0) {
+                    index = index - 1
+                }
+                if (index < this.selected.length) {
+                    this.$refs.selectedItem[index].focus()
+                }
+                else {
+                    index = null
+                    this.$refs.search.focus()
+                }
+
+                this.focused = [index]
+            })
         },
 
         unselect(event, index, id) {
@@ -228,13 +332,13 @@ export default {
                     this.$refs.search.focus()
                 }
 
-                this.focused = index
+                this.focused = [index]
             })
 
         },
 
         selectAll() {
-            this.focused = null
+            this.unfocus()
             let selected = this.selected;
 
             this.selectingAll = ! this.selectingAll;
@@ -286,7 +390,7 @@ export default {
         },
 
         clearSearch() {
-            this.focused = null
+            this.unfocus()
             this.selectingAll = false
             this.search = null
             this.abandoned = false
@@ -319,7 +423,7 @@ export default {
         },
 
         togglePreview(event) {
-            this.focused = null
+            this.unfocus()
             this.preview = ! this.preview
         },
 

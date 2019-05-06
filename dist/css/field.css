@@ -1,0 +1,8 @@
+.input-focus-size {
+  height: 0;
+}
+
+.input-focus-size:focus {
+  height: auto;
+}
+

@@ -245,6 +245,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_laravel_nova___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_laravel_nova__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue__);
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -414,6 +425,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
         },
         focus: function focus(event, index, offset) {
+
             if (offset < 0) {
                 if (index > 0) {
                     index = index + offset;
@@ -429,33 +441,107 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 }
             }
 
-            this.focused = index;
+            this.focused = [index];
+
+            console.log('focus', this.focused);
         },
-        focused: function focused(index, only) {
+        unfocus: function unfocus() {
+            this.focused = [];
+        },
+        isFocused: function isFocused(index, only) {
             if (only) {
-                return this.focused == [index];
+                return this.focused[0] === index;
             }
             return this.focused.includes(index);
+        },
+        addFocus: function addFocus(event, index, join) {
+
+            var focused = this.focused || [];
+
+            if (join) {
+                if (focused.length == 0) {
+                    this.focused = [index];
+                    console.log('addFocus-only', this.focused);
+                    return;
+                }
+
+                var lowestIndex = Math.min.apply(Math, _toConsumableArray(focused));
+
+                for (var i = lowestIndex; i <= index; i++) {
+                    this.focused.push(i);
+                }
+            } else {
+                focused.push(index);
+            }
+
+            this.focused = focused.filter(function (value, index, self) {
+                return self.indexOf(value) === index;
+            });
+            // .sort()
+
+            console.log('addFocus', this.focused);
+        },
+        moveFocus: function moveFocus(event, offset) {
+            var focused = this.focused || [];
+
+            var lowestIndex = Math.min.apply(Math, _toConsumableArray(focused));
+            var highestIndex = Math.max.apply(Math, _toConsumableArray(focused));
+            var firstIndex = focused[0];
+
+            if (offset < 0) {
+                // Move left
+                if (lowestIndex <= firstIndex && highestIndex == firstIndex) {
+                    // Move start left
+                    if (lowestIndex > 0) {
+                        focused.push(lowestIndex - 1);
+                    }
+                } else {
+                    // Move end left
+                    focused.pop();
+                }
+            } else if (offset > 0) {
+                // Move right
+                if (highestIndex >= firstIndex && lowestIndex == firstIndex) {
+                    // Move end right
+                    if (highestIndex < this.selected.length - 1) {
+                        focused.push(highestIndex + 1);
+                    }
+                } else {
+                    // Move start right
+                    focused.pop();
+                }
+            }
+
+            this.focused = focused.filter(function (value, index, self) {
+                return self.indexOf(value) === index;
+            });
         },
         focusBack: function focusBack(event) {
             if (event.target.selectionStart == 0 && this.selected.length > 0) {
                 var index = this.selected.length - 1;
                 this.$refs.selectedItem[index].focus();
-                this.focused = index;
+                this.focused = [index];
             }
         },
         deleteBack: function deleteBack(event) {
             if ((this.search == null || this.search.length == 0) && event.key == 'Backspace' && this.selected.length > 0) {
-                this.selected.pop();
+                this.$emit('unselected', this.selected.pop());
             }
         },
-        unselect: function unselect(event, index, id) {
+        unselectFocused: function unselectFocused(event) {
             var _this2 = this;
 
-            this.selected = this.selected.filter(function (selectedId) {
-                return selectedId != id;
+            var focused = this.focused || [];
+            focused = focused.map(function (index) {
+                return _this2.selected[index];
             });
-            this.$emit('unselected', id);
+
+            this.selected = this.selected.filter(function (selectedId) {
+                return !focused.includes(selectedId);
+            });
+            this.$emit('unselected', focused);
+
+            var index = Math.min.apply(Math, _toConsumableArray(this.focused));
 
             __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
                 if (event.key == 'Backspace' && index > 0) {
@@ -468,11 +554,33 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     _this2.$refs.search.focus();
                 }
 
-                _this2.focused = index;
+                _this2.focused = [index];
+            });
+        },
+        unselect: function unselect(event, index, id) {
+            var _this3 = this;
+
+            this.selected = this.selected.filter(function (selectedId) {
+                return selectedId != id;
+            });
+            this.$emit('unselected', id);
+
+            __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
+                if (event.key == 'Backspace' && index > 0) {
+                    index = index - 1;
+                }
+                if (index < _this3.selected.length) {
+                    _this3.$refs.selectedItem[index].focus();
+                } else {
+                    index = null;
+                    _this3.$refs.search.focus();
+                }
+
+                _this3.focused = [index];
             });
         },
         selectAll: function selectAll() {
-            this.focused = null;
+            this.unfocus();
             var selected = this.selected;
 
             this.selectingAll = !this.selectingAll;
@@ -524,22 +632,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.$emit('selected', selected);
         },
         clearSearch: function clearSearch() {
-            this.focused = null;
+            this.unfocus();
             this.selectingAll = false;
             this.search = null;
             this.abandoned = false;
         },
         newSearch: function newSearch() {
-            var _this3 = this;
+            var _this4 = this;
 
             this.clearSearch();
 
             __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
-                _this3.$refs.search.focus();
+                _this4.$refs.search.focus();
             });
         },
         checkIfSelectAllIsActive: function checkIfSelectAllIsActive() {
-            var _this4 = this;
+            var _this5 = this;
 
             if (this.resources.length === 0 || this.preview) {
                 this.selectingAll = false;
@@ -549,7 +657,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var visibleAndSelected = [];
 
             this.resources.forEach(function (resource) {
-                if (_this4.selected.includes(resource.value)) {
+                if (_this5.selected.includes(resource.value)) {
                     visibleAndSelected.push(resource.value);
                 }
             });
@@ -557,29 +665,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.selectingAll = visibleAndSelected.length == this.resources.length;
         },
         togglePreview: function togglePreview(event) {
-            this.focused = null;
+            this.unfocus();
             this.preview = !this.preview;
         },
         abandon: function abandon() {
             this.abandoned = this.search && this.search.length > 0;
         },
         unabandon: function unabandon() {
-            var _this5 = this;
+            var _this6 = this;
 
             this.abandoned = false;
 
             __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
-                _this5.$refs.search.focus();
-                _this5.$refs.search.select();
+                _this6.$refs.search.focus();
+                _this6.$refs.search.select();
             });
         }
     },
     computed: {
         selectedResources: function selectedResources() {
-            var _this6 = this;
+            var _this7 = this;
 
             var available = this.available.filter(function (resource) {
-                return _this6.selected.includes(resource.value);
+                return _this7.selected.includes(resource.value);
             });
 
             var selected = this.selected.map(function (id) {
@@ -591,11 +699,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             return selected;
         },
         resources: function resources() {
-            var _this7 = this;
+            var _this8 = this;
 
             if (this.preview) {
                 return this.available.filter(function (resource) {
-                    return _this7.selected.includes(resource.value);
+                    return _this8.selected.includes(resource.value);
                 });
             }
 
@@ -604,7 +712,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
 
             return this.available.filter(function (resource) {
-                return resource.display.toLowerCase().includes(_this7.search.toLowerCase());
+                return resource.display.toLowerCase().includes(_this8.search.toLowerCase());
             });
         },
         hasErrors: function hasErrors() {
@@ -10910,15 +11018,15 @@ var render = function() {
             _c("div", { staticClass: "border-b-0 border border-40 relative" }, [
               _c(
                 "div",
-                {
-                  staticClass: "form-input-bordered px-1 w-full ml-0 m-4",
-                  staticStyle: { "min-height": "2.25rem" }
-                },
+                { staticClass: "form-input-bordered px-1 w-full ml-0 m-4" },
                 [
                   _c(
                     "div",
                     {
-                      staticClass: "flex flex-wrap max-h-search overflow-auto"
+                      staticClass:
+                        "flex items-center flex-wrap max-h-search overflow-auto",
+                      staticStyle: { "min-height": "2.25rem" },
+                      on: { focusout: _vm.unfocus }
                     },
                     [
                       _vm._l(_vm.selectedResources, function(resource, $index) {
@@ -10929,27 +11037,50 @@ var render = function() {
                             ref: "selectedItem",
                             refInFor: true,
                             staticClass:
-                              "flex py-1 px-2 m-1 bg-30 rounded-full select-none cursor-pointer outline-none",
+                              "flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none focus:bg-info",
                             class: {
-                              "bg-primary text-white": _vm.focused($index)
+                              "bg-primary text-white": _vm.isFocused($index),
+                              "py-1 px-2": !resource.avatar
                             },
                             attrs: {
-                              tabindex:
-                                _vm.focused($index, 0) ||
-                                (_vm.focused.length == 0 && $index === 0)
-                                  ? 0
-                                  : -1,
-                              "aria-checked": _vm.focused($index)
+                              tabindex: _vm.isFocused($index, true) ? 0 : -1,
+                              "aria-checked": _vm.isFocused($index)
                             },
                             on: {
-                              click: function($event) {
-                                return _vm.focus($event, $index)
-                              },
+                              click: [
+                                function($event) {
+                                  if (!$event.ctrlKey) {
+                                    return null
+                                  }
+                                  if (
+                                    $event.shiftKey ||
+                                    $event.altKey ||
+                                    $event.metaKey
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.addFocus($event, $index)
+                                },
+                                function($event) {
+                                  if (!$event.shiftKey) {
+                                    return null
+                                  }
+                                  return _vm.addFocus($event, $index, true)
+                                },
+                                function($event) {
+                                  if (
+                                    $event.ctrlKey ||
+                                    $event.shiftKey ||
+                                    $event.altKey ||
+                                    $event.metaKey
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.focus($event, $index)
+                                }
+                              ],
                               focus: function($event) {
                                 _vm.focused = [$index]
-                              },
-                              blur: function($event) {
-                                _vm.focused = []
                               },
                               keydown: [
                                 function($event) {
@@ -10966,11 +11097,7 @@ var render = function() {
                                     return null
                                   }
                                   $event.preventDefault()
-                                  return _vm.unselect(
-                                    $event,
-                                    $index,
-                                    resource.value
-                                  )
+                                  return _vm.unselectFocused($event)
                                 },
                                 function($event) {
                                   if (
@@ -10991,7 +11118,14 @@ var render = function() {
                                   ) {
                                     return null
                                   }
-                                  $event.preventDefault()
+                                  if (
+                                    $event.ctrlKey ||
+                                    $event.shiftKey ||
+                                    $event.altKey ||
+                                    $event.metaKey
+                                  ) {
+                                    return null
+                                  }
                                   return _vm.focus($event, $index, -1)
                                 },
                                 function($event) {
@@ -11013,13 +11147,77 @@ var render = function() {
                                   ) {
                                     return null
                                   }
-                                  $event.preventDefault()
+                                  if (
+                                    $event.ctrlKey ||
+                                    $event.shiftKey ||
+                                    $event.altKey ||
+                                    $event.metaKey
+                                  ) {
+                                    return null
+                                  }
                                   return _vm.focus($event, $index, 1)
+                                },
+                                function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "left",
+                                      37,
+                                      $event.key,
+                                      ["Left", "ArrowLeft"]
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  if (
+                                    "button" in $event &&
+                                    $event.button !== 0
+                                  ) {
+                                    return null
+                                  }
+                                  if (!$event.shiftKey) {
+                                    return null
+                                  }
+                                  return _vm.moveFocus($event, -1)
+                                },
+                                function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "right",
+                                      39,
+                                      $event.key,
+                                      ["Right", "ArrowRight"]
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  if (
+                                    "button" in $event &&
+                                    $event.button !== 2
+                                  ) {
+                                    return null
+                                  }
+                                  if (!$event.shiftKey) {
+                                    return null
+                                  }
+                                  return _vm.moveFocus($event, 1)
                                 }
                               ]
                             }
                           },
                           [
+                            resource.avatar
+                              ? _c("div", { staticClass: "m-px mr-2" }, [
+                                  _c("img", {
+                                    staticClass: "w-4 h-4 rounded-full block",
+                                    attrs: { src: resource.avatar }
+                                  })
+                                ])
+                              : _vm._e(),
+                            _vm._v(" "),
                             _c("span", [_vm._v(_vm._s(resource.display))]),
                             _vm._v(" "),
                             _c(
@@ -11028,10 +11226,10 @@ var render = function() {
                                 staticClass:
                                   "font-sans font-bolder pl-2 cursor-pointer",
                                 class: {
-                                  "text-80 hover:text-black": _vm.focused(
+                                  "text-80 hover:text-black": _vm.isFocused(
                                     $index
                                   ),
-                                  "text-white-50% hover:text-white": _vm.focused(
+                                  "text-white-50% hover:text-white": _vm.isFocused(
                                     $index
                                   )
                                 },
@@ -11051,32 +11249,39 @@ var render = function() {
                         )
                       }),
                       _vm._v(" "),
-                      _c(
-                        "div",
-                        {
-                          staticClass:
-                            "py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none hidden",
-                          class: { flex: _vm.abandoned },
-                          attrs: { tabindex: "0" },
-                          on: { click: _vm.unabandon }
-                        },
-                        [
-                          _c("span", [_vm._v(_vm._s(_vm.search))]),
-                          _vm._v(" "),
-                          _c(
-                            "span",
+                      _vm.abandoned
+                        ? _c(
+                            "div",
                             {
                               staticClass:
-                                "font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white",
-                              on: { click: _vm.newSearch }
+                                "py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex",
+                              attrs: { tabindex: "0" },
+                              on: { click: _vm.unabandon }
                             },
-                            [_vm._v("x")]
+                            [
+                              _c("span", [_vm._v(_vm._s(_vm.search))]),
+                              _vm._v(" "),
+                              _c(
+                                "span",
+                                {
+                                  staticClass:
+                                    "font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white",
+                                  on: { click: _vm.newSearch }
+                                },
+                                [_vm._v("x")]
+                              )
+                            ]
                           )
-                        ]
-                      ),
+                        : _vm._e(),
                       _vm._v(" "),
                       _c("input", {
                         directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: !_vm.abandoned,
+                            expression: "!abandoned"
+                          },
                           {
                             name: "model",
                             rawName: "v-model",
@@ -11086,8 +11291,7 @@ var render = function() {
                         ],
                         ref: "search",
                         staticClass:
-                          "outline-none search-input-input px-1 py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1",
-                        class: { hidden: _vm.abandoned },
+                          "outline-none search-input-input px-1 py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size",
                         staticStyle: { "min-width": "2rem" },
                         attrs: {
                           disabled: _vm.disabled,
@@ -11183,7 +11387,7 @@ var render = function() {
                         {
                           key: resource.value,
                           staticClass:
-                            "flex py-3 cursor-pointer select-none hover:bg-30",
+                            "flex items-center py-3 cursor-pointer select-none hover:bg-30",
                           on: {
                             click: function($event) {
                               return _vm.toggle($event, resource.value)
@@ -11204,7 +11408,18 @@ var render = function() {
                             1
                           ),
                           _vm._v(" "),
-                          _c("span", [_vm._v(_vm._s(resource.display))])
+                          resource.avatar
+                            ? _c("div", { staticClass: "mr-3" }, [
+                                _c("img", {
+                                  staticClass: "w-8 h-8 rounded-full block",
+                                  attrs: { src: resource.avatar }
+                                })
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "flex-no-grow" }, [
+                            _vm._v(_vm._s(resource.display))
+                          ])
                         ]
                       )
                     })

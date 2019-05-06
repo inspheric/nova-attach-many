@@ -39,10 +39,11 @@ class AttachController extends Controller
             ->mapInto($field->resourceClass)
             ->filter(function ($resource) use ($request, $field) {
                 return $request->newResource()->authorizedToAttach($request, $resource->resource);
-            })->map(function($resource) {
+            })->map(function($resource) use ($request, $field) {
                 return [
-                    'display' => $resource->title(),
+                    'display' => $field->publicFormatDisplayValue($resource),
                     'value' => $resource->getKey(),
+                    'avatar' => $resource->resolveAvatarUrl($request),
                 ];
             })->values();
     }

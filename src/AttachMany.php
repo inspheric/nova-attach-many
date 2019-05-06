@@ -5,6 +5,8 @@ namespace NovaAttachMany;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Authorizable;
+use Laravel\Nova\Fields\FormatsRelatableDisplayValues;
+
 use NovaAttachMany\Rules\ArrayRules;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Fields\ResourceRelationshipGuesser;
@@ -12,6 +14,7 @@ use Laravel\Nova\Fields\ResourceRelationshipGuesser;
 class AttachMany extends Field
 {
     use Authorizable;
+    use FormatsRelatableDisplayValues;
 
     public $height = '300px';
 
@@ -28,6 +31,13 @@ class AttachMany extends Field
     public $showOnDetail = false;
 
     public $component = 'nova-attach-many';
+
+    /**
+     * The column that should be displayed for the field.
+     *
+     * @var \Closure
+     */
+    public $display;
 
     public function __construct($name, $attribute = null, $resource = null)
     {
@@ -122,5 +132,10 @@ class AttachMany extends Field
         $this->showPreview = $showPreview;
 
         return $this;
+    }
+
+    public function publicFormatDisplayValue($resource)
+    {
+        return $this->formatDisplayValue($resource);
     }
 }
