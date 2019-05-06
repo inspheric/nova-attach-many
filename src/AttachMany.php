@@ -23,7 +23,7 @@ class AttachMany extends Field
     public $component = 'nova-attach-many';
 
     /**
-     * Indicates if the related resource can be viewed.
+     * Indicates if the related resources can be viewed.
      *
      * @var bool
      */
@@ -37,6 +37,13 @@ class AttachMany extends Field
      * @var bool
      */
     public $limit;
+
+    /**
+     * Indicates whether related resources are shown as chips on the detail view.
+     *
+     * @var bool
+     */
+    public $chips = false;
 
     /**
      * The column that should be displayed for the field.
@@ -150,6 +157,19 @@ class AttachMany extends Field
     }
 
     /**
+     * Specify that the related resources should be displayed as chips on the detail view.
+     *
+     * @param  bool  $chips
+     * @return $this
+     */
+    public function chips(bool $chips = true)
+    {
+        $this->chips = $chips;
+
+        return $this;
+    }
+
+    /**
      * Specify that all items should be displayed on the detail view.
      *
      * @return $this
@@ -174,7 +194,7 @@ class AttachMany extends Field
     public function meta()
     {
         return array_merge([
-            'chips' => true,
+            'chips' => $this->chips,
             'related' => $this->related,
             'limit' => $this->limit,
             'resourceName' => $this->resourceName,
