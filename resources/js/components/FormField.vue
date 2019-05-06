@@ -16,18 +16,24 @@
                 </div>
                 <div class="border-b-0 border border-40 relative">
                     <div class="form-input-bordered px-1 w-full ml-0 m-4">
-                        <div class="flex items-center flex-wrap max-h-search overflow-auto" style="min-height: 2.25rem;" @focusout="unfocus">
-                            <div v-for="(resource, $index) in selectedResources"
+                        <div
+                            class="flex items-center flex-wrap max-h-search overflow-auto"
+                            style="min-height: 2.25rem;"
+                            @focusout="unfocus"
+                            @click.self="$refs.search.focus()"
+                        >
+                            <div
+                                v-for="(resource, $index) in selectedResources"
                                 :key="$index"
                                 :tabindex="isFocused($index, true) ? 0 : -1"
                                 :aria-checked="isFocused($index)"
                                 ref="selectedItem"
-                                class="flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none focus:bg-info"
-                                :class="{ 'bg-primary text-white': isFocused($index), 'py-1 px-2': !resource.avatar }"
-                                @click.ctrl.exact="addFocus($event, $index)"
-                                @click.shift="addFocus($event, $index, true)"
+                                class="flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none"
+                                :class="{ 'bg-primary text-white': isFocused($index), 'py-1 pl-2': !resource.avatar }"
+                                @mousedown.ctrl.exact="addFocus($event, $index)"
+                                @mousedown.shift="addFocus($event, $index, true)"
                                 @click.exact="focus($event, $index)"
-                                @focus="focused = [$index]"
+                                @focus="pushFocus($event, $index)"
                                 @keydown.delete.prevent="unselectFocused($event)"
                                 @keydown.left.exact="focus($event, $index, -1)"
                                 @keydown.right.exact="focus($event, $index, 1)"
@@ -35,7 +41,7 @@
                                 @keydown.right.shift="moveFocus($event, 1)"
                             >
                                 <div v-if="resource.avatar" class="m-px mr-2">
-                                    <img :src="resource.avatar" class="w-4 h-4 rounded-full block" />
+                                    <img :src="resource.avatar" class="w-6 h-6 rounded-full block" />
                                 </div>
                                 <span>{{ resource.display }}</span>
                                 <span @click="unselect($event, $index, resource.value)"
@@ -179,26 +185,36 @@ export default {
             }
         },
 
+        pushFocus(event, index) {
+            this.focused.push(index)
+        },
+
         focus(event, index, offset) {
 
             if (offset < 0) {
                 if (index > 0) {
                     index = index + offset
-                    this.$refs.selectedItem[index].focus()
                 }
             }
             else if (offset > 0) {
                 if (index < this.selected.length - 1) {
                     index = index + offset
-                    this.$refs.selectedItem[index].focus()
                 }
                 else {
                     index = null
-                    this.$refs.search.focus()
                 }
             }
 
             this.focused = [index]
+
+            Vue.nextTick(() => {
+                if (index == null) {
+                    this.$refs.search.focus()
+                }
+                else {
+                    this.$refs.selectedItem[index].focus()
+                }
+            })
 
             console.log('focus', this.focused)
         },

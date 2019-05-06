@@ -367,6 +367,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -424,24 +430,33 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                 this.$emit('selected', id);
             }
         },
+        pushFocus: function pushFocus(event, index) {
+            this.focused.push(index);
+        },
         focus: function focus(event, index, offset) {
+            var _this2 = this;
 
             if (offset < 0) {
                 if (index > 0) {
                     index = index + offset;
-                    this.$refs.selectedItem[index].focus();
                 }
             } else if (offset > 0) {
                 if (index < this.selected.length - 1) {
                     index = index + offset;
-                    this.$refs.selectedItem[index].focus();
                 } else {
                     index = null;
-                    this.$refs.search.focus();
                 }
             }
 
             this.focused = [index];
+
+            __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
+                if (index == null) {
+                    _this2.$refs.search.focus();
+                } else {
+                    _this2.$refs.selectedItem[index].focus();
+                }
+            });
 
             console.log('focus', this.focused);
         },
@@ -529,11 +544,11 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             }
         },
         unselectFocused: function unselectFocused(event) {
-            var _this2 = this;
+            var _this3 = this;
 
             var focused = this.focused || [];
             focused = focused.map(function (index) {
-                return _this2.selected[index];
+                return _this3.selected[index];
             });
 
             this.selected = this.selected.filter(function (selectedId) {
@@ -547,18 +562,18 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                 if (event.key == 'Backspace' && index > 0) {
                     index = index - 1;
                 }
-                if (index < _this2.selected.length) {
-                    _this2.$refs.selectedItem[index].focus();
+                if (index < _this3.selected.length) {
+                    _this3.$refs.selectedItem[index].focus();
                 } else {
                     index = null;
-                    _this2.$refs.search.focus();
+                    _this3.$refs.search.focus();
                 }
 
-                _this2.focused = [index];
+                _this3.focused = [index];
             });
         },
         unselect: function unselect(event, index, id) {
-            var _this3 = this;
+            var _this4 = this;
 
             this.selected = this.selected.filter(function (selectedId) {
                 return selectedId != id;
@@ -569,14 +584,14 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                 if (event.key == 'Backspace' && index > 0) {
                     index = index - 1;
                 }
-                if (index < _this3.selected.length) {
-                    _this3.$refs.selectedItem[index].focus();
+                if (index < _this4.selected.length) {
+                    _this4.$refs.selectedItem[index].focus();
                 } else {
                     index = null;
-                    _this3.$refs.search.focus();
+                    _this4.$refs.search.focus();
                 }
 
-                _this3.focused = [index];
+                _this4.focused = [index];
             });
         },
         selectAll: function selectAll() {
@@ -638,16 +653,16 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             this.abandoned = false;
         },
         newSearch: function newSearch() {
-            var _this4 = this;
+            var _this5 = this;
 
             this.clearSearch();
 
             __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
-                _this4.$refs.search.focus();
+                _this5.$refs.search.focus();
             });
         },
         checkIfSelectAllIsActive: function checkIfSelectAllIsActive() {
-            var _this5 = this;
+            var _this6 = this;
 
             if (this.resources.length === 0 || this.preview) {
                 this.selectingAll = false;
@@ -657,7 +672,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             var visibleAndSelected = [];
 
             this.resources.forEach(function (resource) {
-                if (_this5.selected.includes(resource.value)) {
+                if (_this6.selected.includes(resource.value)) {
                     visibleAndSelected.push(resource.value);
                 }
             });
@@ -672,22 +687,22 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             this.abandoned = this.search && this.search.length > 0;
         },
         unabandon: function unabandon() {
-            var _this6 = this;
+            var _this7 = this;
 
             this.abandoned = false;
 
             __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
-                _this6.$refs.search.focus();
-                _this6.$refs.search.select();
+                _this7.$refs.search.focus();
+                _this7.$refs.search.select();
             });
         }
     },
     computed: {
         selectedResources: function selectedResources() {
-            var _this7 = this;
+            var _this8 = this;
 
             var available = this.available.filter(function (resource) {
-                return _this7.selected.includes(resource.value);
+                return _this8.selected.includes(resource.value);
             });
 
             var selected = this.selected.map(function (id) {
@@ -699,11 +714,11 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             return selected;
         },
         resources: function resources() {
-            var _this8 = this;
+            var _this9 = this;
 
             if (this.preview) {
                 return this.available.filter(function (resource) {
-                    return _this8.selected.includes(resource.value);
+                    return _this9.selected.includes(resource.value);
                 });
             }
 
@@ -712,7 +727,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             }
 
             return this.available.filter(function (resource) {
-                return resource.display.toLowerCase().includes(_this8.search.toLowerCase());
+                return resource.display.toLowerCase().includes(_this9.search.toLowerCase());
             });
         },
         hasErrors: function hasErrors() {
@@ -11026,7 +11041,15 @@ var render = function() {
                       staticClass:
                         "flex items-center flex-wrap max-h-search overflow-auto",
                       staticStyle: { "min-height": "2.25rem" },
-                      on: { focusout: _vm.unfocus }
+                      on: {
+                        focusout: _vm.unfocus,
+                        click: function($event) {
+                          if ($event.target !== $event.currentTarget) {
+                            return null
+                          }
+                          return _vm.$refs.search.focus()
+                        }
+                      }
                     },
                     [
                       _vm._l(_vm.selectedResources, function(resource, $index) {
@@ -11037,17 +11060,17 @@ var render = function() {
                             ref: "selectedItem",
                             refInFor: true,
                             staticClass:
-                              "flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none focus:bg-info",
+                              "flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none",
                             class: {
                               "bg-primary text-white": _vm.isFocused($index),
-                              "py-1 px-2": !resource.avatar
+                              "py-1 pl-2": !resource.avatar
                             },
                             attrs: {
                               tabindex: _vm.isFocused($index, true) ? 0 : -1,
                               "aria-checked": _vm.isFocused($index)
                             },
                             on: {
-                              click: [
+                              mousedown: [
                                 function($event) {
                                   if (!$event.ctrlKey) {
                                     return null
@@ -11066,21 +11089,21 @@ var render = function() {
                                     return null
                                   }
                                   return _vm.addFocus($event, $index, true)
-                                },
-                                function($event) {
-                                  if (
-                                    $event.ctrlKey ||
-                                    $event.shiftKey ||
-                                    $event.altKey ||
-                                    $event.metaKey
-                                  ) {
-                                    return null
-                                  }
-                                  return _vm.focus($event, $index)
                                 }
                               ],
+                              click: function($event) {
+                                if (
+                                  $event.ctrlKey ||
+                                  $event.shiftKey ||
+                                  $event.altKey ||
+                                  $event.metaKey
+                                ) {
+                                  return null
+                                }
+                                return _vm.focus($event, $index)
+                              },
                               focus: function($event) {
-                                _vm.focused = [$index]
+                                return _vm.pushFocus($event, $index)
                               },
                               keydown: [
                                 function($event) {
@@ -11212,7 +11235,7 @@ var render = function() {
                             resource.avatar
                               ? _c("div", { staticClass: "m-px mr-2" }, [
                                   _c("img", {
-                                    staticClass: "w-4 h-4 rounded-full block",
+                                    staticClass: "w-6 h-6 rounded-full block",
                                     attrs: { src: resource.avatar }
                                   })
                                 ])
