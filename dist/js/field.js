@@ -364,17 +364,6 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -11004,104 +10993,123 @@ var render = function() {
     [
       _c(
         "template",
-        { class: { "border-danger border": _vm.hasErrors }, slot: "field" },
+        { slot: "field" },
         [
-          _c("div", { class: { "border-danger border": _vm.hasErrors } }, [
-            _vm.field.showToolbar
-              ? _c(
+          _c("div", { staticClass: "border-b-0 border border-40 relative" }, [
+            _c(
+              "div",
+              {
+                staticClass:
+                  "form-input-bordered px-1 w-full ml-0 m-4 form-input-within",
+                class: { "border-danger": _vm.hasErrors }
+              },
+              [
+                _c(
                   "div",
-                  { staticClass: "flex border-b-0 border border-40 relative" },
-                  [
-                    _c(
-                      "div",
-                      {
-                        staticClass:
-                          "w-16 text-center flex justify-center items-center",
-                        on: { click: _vm.selectAll }
+                  {
+                    ref: "selectedItems",
+                    staticClass:
+                      "flex items-center flex-wrap max-h-search overflow-auto py-px cursor-text",
+                    staticStyle: { "min-height": "2.25rem" },
+                    on: {
+                      focusout: function($event) {
+                        return _vm.unfocus($event)
                       },
-                      [
-                        _c("fake-checkbox", {
-                          staticClass: "cursor-pointer",
-                          attrs: {
-                            checked: _vm.selectingAll,
-                            title: _vm.__("Select all")
-                          }
-                        })
-                      ],
-                      1
-                    )
-                  ]
-                )
-              : _vm._e(),
-            _vm._v(" "),
-            _c("div", { staticClass: "border-b-0 border border-40 relative" }, [
-              _c(
-                "div",
-                {
-                  staticClass:
-                    "form-input-bordered px-1 w-full ml-0 m-4 form-input-within"
-                },
-                [
-                  _c(
-                    "div",
-                    {
-                      ref: "selectedItems",
-                      staticClass:
-                        "flex items-center flex-wrap max-h-search overflow-auto py-px cursor-text",
-                      staticStyle: { "min-height": "2.25rem" },
-                      on: {
-                        focusout: function($event) {
-                          return _vm.unfocus($event)
-                        },
-                        click: function($event) {
-                          if ($event.target !== $event.currentTarget) {
-                            return null
-                          }
-                          return _vm.unabandon($event)
+                      click: function($event) {
+                        if ($event.target !== $event.currentTarget) {
+                          return null
                         }
+                        return _vm.unabandon($event)
                       }
-                    },
-                    [
-                      _vm._l(_vm.selectedResources, function(resource, $index) {
-                        return _c(
-                          "div",
-                          {
-                            key: $index,
-                            ref: "selectedItem",
-                            refInFor: true,
-                            staticClass:
-                              "flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none",
-                            class: {
-                              "bg-primary text-white": _vm.isFocused($index),
-                              "py-1 pl-2": !resource.avatar
-                            },
-                            attrs: {
-                              tabindex: _vm.isFocused($index, true) ? 0 : -1,
-                              "aria-checked": _vm.isFocused($index)
-                            },
-                            on: {
-                              mousedown: [
-                                function($event) {
-                                  if (!$event.ctrlKey) {
-                                    return null
-                                  }
-                                  if (
-                                    $event.shiftKey ||
-                                    $event.altKey ||
-                                    $event.metaKey
-                                  ) {
-                                    return null
-                                  }
-                                  return _vm.addFocus($event, $index)
-                                },
-                                function($event) {
-                                  if (!$event.shiftKey) {
-                                    return null
-                                  }
-                                  return _vm.addFocus($event, $index, true)
+                    }
+                  },
+                  [
+                    _vm._l(_vm.selectedResources, function(resource, $index) {
+                      return _c(
+                        "div",
+                        {
+                          key: $index,
+                          ref: "selectedItem",
+                          refInFor: true,
+                          staticClass:
+                            "flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none",
+                          class: {
+                            "bg-primary text-white": _vm.isFocused($index),
+                            "py-1 pl-2": !resource.avatar
+                          },
+                          attrs: {
+                            tabindex: _vm.isFocused($index, true) ? 0 : -1,
+                            "aria-checked": _vm.isFocused($index)
+                          },
+                          on: {
+                            mousedown: [
+                              function($event) {
+                                if (!$event.ctrlKey) {
+                                  return null
                                 }
-                              ],
-                              click: function($event) {
+                                if (
+                                  $event.shiftKey ||
+                                  $event.altKey ||
+                                  $event.metaKey
+                                ) {
+                                  return null
+                                }
+                                return _vm.addFocus($event, $index)
+                              },
+                              function($event) {
+                                if (!$event.shiftKey) {
+                                  return null
+                                }
+                                return _vm.addFocus($event, $index, true)
+                              }
+                            ],
+                            click: function($event) {
+                              if (
+                                $event.ctrlKey ||
+                                $event.shiftKey ||
+                                $event.altKey ||
+                                $event.metaKey
+                              ) {
+                                return null
+                              }
+                              return _vm.focus($event, $index)
+                            },
+                            focus: function($event) {
+                              return _vm.pushFocus($event, $index)
+                            },
+                            keydown: [
+                              function($event) {
+                                if (
+                                  !$event.type.indexOf("key") &&
+                                  _vm._k(
+                                    $event.keyCode,
+                                    "delete",
+                                    [8, 46],
+                                    $event.key,
+                                    ["Backspace", "Delete", "Del"]
+                                  )
+                                ) {
+                                  return null
+                                }
+                                $event.preventDefault()
+                                return _vm.unselectFocused($event)
+                              },
+                              function($event) {
+                                if (
+                                  !$event.type.indexOf("key") &&
+                                  _vm._k(
+                                    $event.keyCode,
+                                    "left",
+                                    37,
+                                    $event.key,
+                                    ["Left", "ArrowLeft"]
+                                  )
+                                ) {
+                                  return null
+                                }
+                                if ("button" in $event && $event.button !== 0) {
+                                  return null
+                                }
                                 if (
                                   $event.ctrlKey ||
                                   $event.shiftKey ||
@@ -11110,371 +11118,312 @@ var render = function() {
                                 ) {
                                   return null
                                 }
-                                return _vm.focus($event, $index)
+                                return _vm.focus($event, $index, -1)
                               },
-                              focus: function($event) {
-                                return _vm.pushFocus($event, $index)
-                              },
-                              keydown: [
-                                function($event) {
-                                  if (
-                                    !$event.type.indexOf("key") &&
-                                    _vm._k(
-                                      $event.keyCode,
-                                      "delete",
-                                      [8, 46],
-                                      $event.key,
-                                      ["Backspace", "Delete", "Del"]
-                                    )
-                                  ) {
-                                    return null
-                                  }
-                                  $event.preventDefault()
-                                  return _vm.unselectFocused($event)
-                                },
-                                function($event) {
-                                  if (
-                                    !$event.type.indexOf("key") &&
-                                    _vm._k(
-                                      $event.keyCode,
-                                      "left",
-                                      37,
-                                      $event.key,
-                                      ["Left", "ArrowLeft"]
-                                    )
-                                  ) {
-                                    return null
-                                  }
-                                  if (
-                                    "button" in $event &&
-                                    $event.button !== 0
-                                  ) {
-                                    return null
-                                  }
-                                  if (
-                                    $event.ctrlKey ||
-                                    $event.shiftKey ||
-                                    $event.altKey ||
-                                    $event.metaKey
-                                  ) {
-                                    return null
-                                  }
-                                  return _vm.focus($event, $index, -1)
-                                },
-                                function($event) {
-                                  if (
-                                    !$event.type.indexOf("key") &&
-                                    _vm._k(
-                                      $event.keyCode,
-                                      "right",
-                                      39,
-                                      $event.key,
-                                      ["Right", "ArrowRight"]
-                                    )
-                                  ) {
-                                    return null
-                                  }
-                                  if (
-                                    "button" in $event &&
-                                    $event.button !== 2
-                                  ) {
-                                    return null
-                                  }
-                                  if (
-                                    $event.ctrlKey ||
-                                    $event.shiftKey ||
-                                    $event.altKey ||
-                                    $event.metaKey
-                                  ) {
-                                    return null
-                                  }
-                                  return _vm.focus($event, $index, 1)
-                                },
-                                function($event) {
-                                  if (
-                                    !$event.type.indexOf("key") &&
-                                    _vm._k(
-                                      $event.keyCode,
-                                      "left",
-                                      37,
-                                      $event.key,
-                                      ["Left", "ArrowLeft"]
-                                    )
-                                  ) {
-                                    return null
-                                  }
-                                  if (
-                                    "button" in $event &&
-                                    $event.button !== 0
-                                  ) {
-                                    return null
-                                  }
-                                  if (!$event.shiftKey) {
-                                    return null
-                                  }
-                                  return _vm.moveFocus($event, -1)
-                                },
-                                function($event) {
-                                  if (
-                                    !$event.type.indexOf("key") &&
-                                    _vm._k(
-                                      $event.keyCode,
-                                      "right",
-                                      39,
-                                      $event.key,
-                                      ["Right", "ArrowRight"]
-                                    )
-                                  ) {
-                                    return null
-                                  }
-                                  if (
-                                    "button" in $event &&
-                                    $event.button !== 2
-                                  ) {
-                                    return null
-                                  }
-                                  if (!$event.shiftKey) {
-                                    return null
-                                  }
-                                  return _vm.moveFocus($event, 1)
-                                }
-                              ]
-                            }
-                          },
-                          [
-                            resource.avatar
-                              ? _c("div", { staticClass: "m-px mr-2" }, [
-                                  _c("img", {
-                                    staticClass: "w-6 h-6 rounded-full block",
-                                    attrs: { src: resource.avatar }
-                                  })
-                                ])
-                              : _vm._e(),
-                            _vm._v(" "),
-                            _c("span", [_vm._v(_vm._s(resource.display))]),
-                            _vm._v(" "),
-                            _c(
-                              "span",
-                              {
-                                staticClass:
-                                  "font-sans font-bolder pl-2 cursor-pointer",
-                                class: {
-                                  "text-80 hover:text-black": _vm.isFocused(
-                                    $index
-                                  ),
-                                  "text-white-50% hover:text-white": _vm.isFocused(
-                                    $index
+                              function($event) {
+                                if (
+                                  !$event.type.indexOf("key") &&
+                                  _vm._k(
+                                    $event.keyCode,
+                                    "right",
+                                    39,
+                                    $event.key,
+                                    ["Right", "ArrowRight"]
                                   )
-                                },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.unselect(
-                                      $event,
-                                      $index,
-                                      resource.value
-                                    )
-                                  }
+                                ) {
+                                  return null
                                 }
+                                if ("button" in $event && $event.button !== 2) {
+                                  return null
+                                }
+                                if (
+                                  $event.ctrlKey ||
+                                  $event.shiftKey ||
+                                  $event.altKey ||
+                                  $event.metaKey
+                                ) {
+                                  return null
+                                }
+                                return _vm.focus($event, $index, 1)
                               },
-                              [_vm._v("×")]
-                            )
-                          ]
-                        )
-                      }),
-                      _vm._v(" "),
-                      _vm.abandoned
-                        ? _c(
-                            "div",
-                            {
-                              staticClass:
-                                "py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex",
-                              attrs: { tabindex: "0" },
-                              on: { click: _vm.unabandon }
-                            },
-                            [
-                              _c("span", [_vm._v(_vm._s(_vm.search))]),
-                              _vm._v(" "),
-                              _c(
-                                "span",
-                                {
-                                  staticClass:
-                                    "font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white",
-                                  on: { click: _vm.newSearch }
-                                },
-                                [_vm._v("×")]
-                              )
+                              function($event) {
+                                if (
+                                  !$event.type.indexOf("key") &&
+                                  _vm._k(
+                                    $event.keyCode,
+                                    "left",
+                                    37,
+                                    $event.key,
+                                    ["Left", "ArrowLeft"]
+                                  )
+                                ) {
+                                  return null
+                                }
+                                if ("button" in $event && $event.button !== 0) {
+                                  return null
+                                }
+                                if (!$event.shiftKey) {
+                                  return null
+                                }
+                                return _vm.moveFocus($event, -1)
+                              },
+                              function($event) {
+                                if (
+                                  !$event.type.indexOf("key") &&
+                                  _vm._k(
+                                    $event.keyCode,
+                                    "right",
+                                    39,
+                                    $event.key,
+                                    ["Right", "ArrowRight"]
+                                  )
+                                ) {
+                                  return null
+                                }
+                                if ("button" in $event && $event.button !== 2) {
+                                  return null
+                                }
+                                if (!$event.shiftKey) {
+                                  return null
+                                }
+                                return _vm.moveFocus($event, 1)
+                              }
                             ]
-                          )
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "show",
-                            rawName: "v-show",
-                            value: !_vm.abandoned,
-                            expression: "!abandoned"
-                          },
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.search,
-                            expression: "search"
-                          }
-                        ],
-                        ref: "search",
-                        staticClass:
-                          "outline-none search-input-input py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size",
-                        staticStyle: { "min-width": "2rem" },
-                        attrs: {
-                          disabled: _vm.disabled,
-                          type: "text",
-                          spellcheck: "false"
-                        },
-                        domProps: { value: _vm.search },
-                        on: {
-                          keydown: [
-                            function($event) {
-                              if (
-                                !$event.type.indexOf("key") &&
-                                _vm._k($event.keyCode, "esc", 27, $event.key, [
-                                  "Esc",
-                                  "Escape"
-                                ])
-                              ) {
-                                return null
-                              }
-                              $event.preventDefault()
-                              return _vm.clearSearch($event)
-                            },
-                            function($event) {
-                              if (
-                                !$event.type.indexOf("key") &&
-                                _vm._k($event.keyCode, "left", 37, $event.key, [
-                                  "Left",
-                                  "ArrowLeft"
-                                ])
-                              ) {
-                                return null
-                              }
-                              if ("button" in $event && $event.button !== 0) {
-                                return null
-                              }
-                              return _vm.focusBack($event)
-                            },
-                            function($event) {
-                              if (
-                                !$event.type.indexOf("key") &&
-                                _vm._k(
-                                  $event.keyCode,
-                                  "delete",
-                                  [8, 46],
-                                  $event.key,
-                                  ["Backspace", "Delete", "Del"]
-                                )
-                              ) {
-                                return null
-                              }
-                              return _vm.deleteBack($event)
-                            },
-                            function($event) {
-                              if (
-                                !$event.type.indexOf("key") &&
-                                _vm._k(
-                                  $event.keyCode,
-                                  "enter",
-                                  13,
-                                  $event.key,
-                                  "Enter"
-                                )
-                              ) {
-                                return null
-                              }
-                              $event.preventDefault()
-                            }
-                          ],
-                          blur: _vm.abandon,
-                          focus: function($event) {
-                            _vm.abandoned = false
-                          },
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.search = $event.target.value
-                          }
-                        }
-                      })
-                    ],
-                    2
-                  )
-                ]
-              )
-            ]),
-            _vm._v(" "),
-            _c(
-              "div",
-              {
-                staticClass: "border border-40 relative overflow-auto",
-                style: { height: _vm.field.height }
-              },
-              [
-                _vm.loading
-                  ? _c(
-                      "div",
-                      {
-                        staticClass:
-                          "flex justify-center items-center absolute pin z-50 bg-white"
-                      },
-                      [_c("loader", { staticClass: "text-60" })],
-                      1
-                    )
-                  : _vm._l(_vm.resources, function(resource) {
-                      return _c(
-                        "div",
-                        {
-                          key: resource.value,
-                          staticClass:
-                            "flex items-center py-3 cursor-pointer select-none hover:bg-30",
-                          on: {
-                            click: function($event) {
-                              return _vm.toggle($event, resource.value)
-                            }
                           }
                         },
                         [
-                          _c(
-                            "div",
-                            { staticClass: "w-16 flex justify-center" },
-                            [
-                              _c("fake-checkbox", {
-                                attrs: {
-                                  checked: _vm.selected.includes(resource.value)
-                                }
-                              })
-                            ],
-                            1
-                          ),
-                          _vm._v(" "),
                           resource.avatar
-                            ? _c("div", { staticClass: "mr-3" }, [
+                            ? _c("div", { staticClass: "m-px mr-2" }, [
                                 _c("img", {
-                                  staticClass: "w-8 h-8 rounded-full block",
+                                  staticClass: "w-6 h-6 rounded-full block",
                                   attrs: { src: resource.avatar }
                                 })
                               ])
                             : _vm._e(),
                           _vm._v(" "),
-                          _c("span", { staticClass: "flex-no-grow" }, [
-                            _vm._v(_vm._s(resource.display))
-                          ])
+                          _c("span", [_vm._v(_vm._s(resource.display))]),
+                          _vm._v(" "),
+                          _c(
+                            "span",
+                            {
+                              staticClass:
+                                "font-sans font-bolder pl-2 cursor-pointer",
+                              class: {
+                                "text-80 hover:text-black": _vm.isFocused(
+                                  $index
+                                ),
+                                "text-white-50% hover:text-white": _vm.isFocused(
+                                  $index
+                                )
+                              },
+                              on: {
+                                click: function($event) {
+                                  return _vm.unselect(
+                                    $event,
+                                    $index,
+                                    resource.value
+                                  )
+                                }
+                              }
+                            },
+                            [_vm._v("×")]
+                          )
                         ]
                       )
+                    }),
+                    _vm._v(" "),
+                    _vm.abandoned
+                      ? _c(
+                          "div",
+                          {
+                            staticClass:
+                              "py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex",
+                            attrs: { tabindex: "0" },
+                            on: { click: _vm.unabandon }
+                          },
+                          [
+                            _c("span", [_vm._v(_vm._s(_vm.search))]),
+                            _vm._v(" "),
+                            _c(
+                              "span",
+                              {
+                                staticClass:
+                                  "font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white",
+                                on: { click: _vm.newSearch }
+                              },
+                              [_vm._v("×")]
+                            )
+                          ]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: !_vm.abandoned,
+                          expression: "!abandoned"
+                        },
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.search,
+                          expression: "search"
+                        }
+                      ],
+                      ref: "search",
+                      staticClass:
+                        "outline-none search-input-input py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size",
+                      staticStyle: { "min-width": "2rem" },
+                      attrs: {
+                        disabled: _vm.disabled,
+                        type: "text",
+                        spellcheck: "false"
+                      },
+                      domProps: { value: _vm.search },
+                      on: {
+                        keydown: [
+                          function($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k($event.keyCode, "esc", 27, $event.key, [
+                                "Esc",
+                                "Escape"
+                              ])
+                            ) {
+                              return null
+                            }
+                            $event.preventDefault()
+                            return _vm.clearSearch($event)
+                          },
+                          function($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k($event.keyCode, "left", 37, $event.key, [
+                                "Left",
+                                "ArrowLeft"
+                              ])
+                            ) {
+                              return null
+                            }
+                            if ("button" in $event && $event.button !== 0) {
+                              return null
+                            }
+                            return _vm.focusBack($event)
+                          },
+                          function($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "delete",
+                                [8, 46],
+                                $event.key,
+                                ["Backspace", "Delete", "Del"]
+                              )
+                            ) {
+                              return null
+                            }
+                            return _vm.deleteBack($event)
+                          },
+                          function($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "enter",
+                                13,
+                                $event.key,
+                                "Enter"
+                              )
+                            ) {
+                              return null
+                            }
+                            $event.preventDefault()
+                          }
+                        ],
+                        blur: _vm.abandon,
+                        focus: function($event) {
+                          _vm.abandoned = false
+                        },
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.search = $event.target.value
+                        }
+                      }
                     })
-              ],
-              2
+                  ],
+                  2
+                )
+              ]
             )
           ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "border border-40 relative overflow-auto",
+              style: { height: _vm.field.height }
+            },
+            [
+              _vm.loading
+                ? _c(
+                    "div",
+                    {
+                      staticClass:
+                        "flex justify-center items-center absolute pin z-50 bg-white"
+                    },
+                    [_c("loader", { staticClass: "text-60" })],
+                    1
+                  )
+                : _vm._l(_vm.resources, function(resource) {
+                    return _c(
+                      "div",
+                      {
+                        key: resource.value,
+                        staticClass:
+                          "flex items-center py-3 cursor-pointer select-none hover:bg-30",
+                        on: {
+                          click: function($event) {
+                            return _vm.toggle($event, resource.value)
+                          }
+                        }
+                      },
+                      [
+                        _c(
+                          "div",
+                          { staticClass: "w-16 flex justify-center" },
+                          [
+                            _c("fake-checkbox", {
+                              attrs: {
+                                checked: _vm.selected.includes(resource.value)
+                              }
+                            })
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        resource.avatar
+                          ? _c("div", { staticClass: "mr-3" }, [
+                              _c("img", {
+                                staticClass: "w-8 h-8 rounded-full block",
+                                attrs: { src: resource.avatar }
+                              })
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "flex-no-grow" }, [
+                          _vm._v(_vm._s(resource.display))
+                        ])
+                      ]
+                    )
+                  })
+            ],
+            2
+          ),
           _vm._v(" "),
           _vm.hasErrors
             ? _c("help-text", { staticClass: "error-text mt-2 text-danger" }, [

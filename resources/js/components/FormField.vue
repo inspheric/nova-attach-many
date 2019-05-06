@@ -1,107 +1,96 @@
 <template>
     <default-field :field="field" :full-width-content="field.fullWidth" :show-help-text="false">
-        <template slot="field" :class="{'border-danger border': hasErrors}">
-            <div :class="{'border-danger border': hasErrors}">
-                <div v-if="field.showToolbar" class="flex border-b-0 border border-40 relative">
-                    <!-- <div v-if="preview" class="flex justify-center items-center absolute pin z-10 bg-white">
-                        <h3>{{ __('Selected Items') }} ({{ selected.length  }})</h3>
-                    </div> -->
-                    <div @click="selectAll" class="w-16 text-center flex justify-center items-center">
-                        <fake-checkbox :checked="selectingAll" class="cursor-pointer" :title="__('Select all')"></fake-checkbox>
-                    </div>
-                    <!-- <div class="flex-1 flex items-center relative">
-                        <input v-model="search" type="text" :placeholder="__('Search')" class="form-control form-input form-input-bordered w-full ml-0 m-4">
-                        <span v-if="search" @click="clearSearch" class="pin-r font-sans font-bolder absolute pr-8 cursor-pointer text-black hover:text-80">x</span>
-                    </div> -->
-                </div>
-                <div class="border-b-0 border border-40 relative">
-                    <div class="form-input-bordered px-1 w-full ml-0 m-4 form-input-within">
+        <template slot="field">
+            <!-- <div @click="selectAll" class="w-16 text-center flex justify-center items-center">
+                <fake-checkbox :checked="selectingAll" class="cursor-pointer" :title="__('Select All')"></fake-checkbox>
+            </div> -->
+            <div class="border-b-0 border border-40 relative">
+                <div class="form-input-bordered px-1 w-full ml-0 m-4 form-input-within" :class="{ 'border-danger': hasErrors }">
+                    <div
+                        class="flex items-center flex-wrap max-h-search overflow-auto py-px cursor-text"
+                        style="min-height: 2.25rem;"
+                        ref="selectedItems"
+                        @focusout="unfocus($event)"
+                        @click.self="unabandon"
+                    >
                         <div
-                            class="flex items-center flex-wrap max-h-search overflow-auto py-px cursor-text"
-                            style="min-height: 2.25rem;"
-                            ref="selectedItems"
-                            @focusout="unfocus($event)"
-                            @click.self="unabandon"
+                            v-for="(resource, $index) in selectedResources"
+                            :key="$index"
+                            :tabindex="isFocused($index, true) ? 0 : -1"
+                            :aria-checked="isFocused($index)"
+                            ref="selectedItem"
+                            class="flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none"
+                            :class="{ 'bg-primary text-white': isFocused($index), 'py-1 pl-2': !resource.avatar }"
+                            @mousedown.ctrl.exact="addFocus($event, $index)"
+                            @mousedown.shift="addFocus($event, $index, true)"
+                            @click.exact="focus($event, $index)"
+                            @focus="pushFocus($event, $index)"
+                            @keydown.delete.prevent="unselectFocused($event)"
+                            @keydown.left.exact="focus($event, $index, -1)"
+                            @keydown.right.exact="focus($event, $index, 1)"
+                            @keydown.left.shift="moveFocus($event, -1)"
+                            @keydown.right.shift="moveFocus($event, 1)"
                         >
-                            <div
-                                v-for="(resource, $index) in selectedResources"
-                                :key="$index"
-                                :tabindex="isFocused($index, true) ? 0 : -1"
-                                :aria-checked="isFocused($index)"
-                                ref="selectedItem"
-                                class="flex items-center m-1 pr-2 bg-30 rounded-full select-none cursor-pointer outline-none"
-                                :class="{ 'bg-primary text-white': isFocused($index), 'py-1 pl-2': !resource.avatar }"
-                                @mousedown.ctrl.exact="addFocus($event, $index)"
-                                @mousedown.shift="addFocus($event, $index, true)"
-                                @click.exact="focus($event, $index)"
-                                @focus="pushFocus($event, $index)"
-                                @keydown.delete.prevent="unselectFocused($event)"
-                                @keydown.left.exact="focus($event, $index, -1)"
-                                @keydown.right.exact="focus($event, $index, 1)"
-                                @keydown.left.shift="moveFocus($event, -1)"
-                                @keydown.right.shift="moveFocus($event, 1)"
-                            >
-                                <div v-if="resource.avatar" class="m-px mr-2">
-                                    <img :src="resource.avatar" class="w-6 h-6 rounded-full block" />
-                                </div>
-                                <span>{{ resource.display }}</span>
-                                <span @click="unselect($event, $index, resource.value)"
-                                    class="font-sans font-bolder pl-2 cursor-pointer"
-                                    :class="{
-                                        'text-80 hover:text-black': isFocused($index),
-                                        'text-white-50% hover:text-white': isFocused($index)
-                                        }"
-                                >&times;</span>
+                            <div v-if="resource.avatar" class="m-px mr-2">
+                                <img :src="resource.avatar" class="w-6 h-6 rounded-full block" />
                             </div>
-                            <!--
-                            @blur="clearSearch"
-                            @input="handleInput"
-                            @keydown.enter.prevent="chooseSelected"
-                            @keydown.down.prevent="move(1)"
-                            @keydown.up.prevent="move(-1)" -->
-                            <div
-                                v-if="abandoned"
-                                tabindex="0"
-                                class="py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex"
-                                @click="unabandon"
-                            >
-                                <span>{{ search }}</span>
-                                <span @click="newSearch"
-                                    class="font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white"
-                                >&times;</span>
-                            </div>
-                            <input
-                                v-show="!abandoned"
-                                :disabled="disabled"
-                                v-model="search"
-                                @keydown.esc.prevent="clearSearch"
-                                @keydown.left="focusBack($event)"
-                                @keydown.delete="deleteBack($event)"
-                                @keydown.enter.prevent=""
-                                @blur="abandon"
-                                @focus="abandoned = false"
-                                ref="search"
-                                class="outline-none search-input-input py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size"
-                                type="text"
-                                spellcheck="false"
-                                style="min-width: 2rem;"
-                            />
+                            <span>{{ resource.display }}</span>
+                            <span @click="unselect($event, $index, resource.value)"
+                                class="font-sans font-bolder pl-2 cursor-pointer"
+                                :class="{
+                                    'text-80 hover:text-black': isFocused($index),
+                                    'text-white-50% hover:text-white': isFocused($index)
+                                    }"
+                            >&times;</span>
                         </div>
+                        <!--
+                        @blur="clearSearch"
+                        @input="handleInput"
+                        @keydown.enter.prevent="chooseSelected"
+                        @keydown.down.prevent="move(1)"
+                        @keydown.up.prevent="move(-1)" -->
+                        <div
+                            v-if="abandoned"
+                            tabindex="0"
+                            class="py-1 px-2 m-1 bg-danger text-white rounded-full select-none cursor-pointer outline-none flex"
+                            @click="unabandon"
+                        >
+                            <span>{{ search }}</span>
+                            <span @click="newSearch"
+                                class="font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white"
+                            >&times;</span>
+                        </div>
+                        <input
+                            v-show="!abandoned"
+                            :disabled="disabled"
+                            v-model="search"
+                            @keydown.esc.prevent="clearSearch"
+                            @keydown.left="focusBack($event)"
+                            @keydown.delete="deleteBack($event)"
+                            @keydown.enter.prevent=""
+                            @blur="abandon"
+                            @focus="abandoned = false"
+                            ref="search"
+                            class="outline-none search-input-input py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size"
+                            type="text"
+                            spellcheck="false"
+                            style="min-width: 2rem;"
+                        />
                     </div>
                 </div>
-                <div class="border border-40 relative overflow-auto" :style="{ height: field.height }">
-                    <div v-if="loading" class="flex justify-center items-center absolute pin z-50 bg-white">
-                        <loader class="text-60" />
+            </div>
+            <div class="border border-40 relative overflow-auto" :style="{ height: field.height }">
+                <div v-if="loading" class="flex justify-center items-center absolute pin z-50 bg-white">
+                    <loader class="text-60" />
+                </div>
+                <div v-else v-for="resource in resources" :key="resource.value" @click="toggle($event, resource.value)" class="flex items-center py-3 cursor-pointer select-none hover:bg-30">
+                    <div class="w-16 flex justify-center">
+                        <fake-checkbox :checked="selected.includes(resource.value)" />
                     </div>
-                    <div v-else v-for="resource in resources" :key="resource.value" @click="toggle($event, resource.value)" class="flex items-center py-3 cursor-pointer select-none hover:bg-30">
-                        <div class="w-16 flex justify-center">
-                            <fake-checkbox :checked="selected.includes(resource.value)" />
-                        </div>
-                        <div v-if="resource.avatar" class="mr-3">
-                            <img :src="resource.avatar" class="w-8 h-8 rounded-full block" />
-                        </div>
-                        <span class="flex-no-grow">{{ resource.display }}</span>
+                    <div v-if="resource.avatar" class="mr-3">
+                        <img :src="resource.avatar" class="w-8 h-8 rounded-full block" />
                     </div>
+                    <span class="flex-no-grow">{{ resource.display }}</span>
                 </div>
             </div>
 
