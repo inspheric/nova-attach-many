@@ -373,6 +373,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 //
 //
 //
+//
 
 
 
@@ -436,19 +437,25 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         focus: function focus(event, index, offset) {
             var _this2 = this;
 
-            if (offset < 0) {
-                if (index > 0) {
-                    index = index + offset;
-                }
-            } else if (offset > 0) {
-                if (index < this.selected.length - 1) {
-                    index = index + offset;
-                } else {
-                    index = null;
+            if (!this.focused.includes(index)) {
+                if (offset < 0) {
+                    if (index > 0) {
+                        index = index + offset;
+                    }
+                } else if (offset > 0) {
+                    if (index < this.selected.length - 1) {
+                        index = index + offset;
+                    } else {
+                        index = null;
+                    }
                 }
             }
 
-            this.focused = [index];
+            if (index != null) {
+                this.focused = [index];
+            } else {
+                this.focused = [];
+            }
 
             __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
                 if (index == null) {
@@ -457,10 +464,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                     _this2.$refs.selectedItem[index].focus();
                 }
             });
-
-            console.log('focus', this.focused);
         },
-        unfocus: function unfocus() {
+        unfocus: function unfocus(event) {
+            if (event && event.relatedTarget && parent && event.relatedTarget != this.$refs.search && event.relatedTarget.parentElement == this.$refs.selectedItems) {
+                return;
+            }
+
             this.focused = [];
         },
         isFocused: function isFocused(index, only) {
@@ -470,31 +479,37 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             return this.focused.includes(index);
         },
         addFocus: function addFocus(event, index, join) {
-
             var focused = this.focused || [];
 
             if (join) {
                 if (focused.length == 0) {
                     this.focused = [index];
-                    console.log('addFocus-only', this.focused);
                     return;
                 }
 
+                var highestIndex = Math.max.apply(Math, _toConsumableArray(focused));
                 var lowestIndex = Math.min.apply(Math, _toConsumableArray(focused));
 
-                for (var i = lowestIndex; i <= index; i++) {
-                    this.focused.push(i);
+                if (index > highestIndex) {
+                    for (var i = lowestIndex; i <= index; i++) {
+                        this.focused.push(i);
+                    }
+                } else if (index < lowestIndex) {
+                    for (var _i = index; _i <= highestIndex; _i++) {
+                        this.focused.push(_i);
+                    }
                 }
             } else {
-                focused.push(index);
+                if (focused.includes(index)) {
+                    focused.splice(index, 1);
+                } else {
+                    focused.push(index);
+                }
             }
 
             this.focused = focused.filter(function (value, index, self) {
                 return self.indexOf(value) === index;
             });
-            // .sort()
-
-            console.log('addFocus', this.focused);
         },
         moveFocus: function moveFocus(event, offset) {
             var focused = this.focused || [];
@@ -11038,11 +11053,14 @@ var render = function() {
                   _c(
                     "div",
                     {
+                      ref: "selectedItems",
                       staticClass:
-                        "flex items-center flex-wrap max-h-search overflow-auto",
+                        "flex items-center flex-wrap max-h-search overflow-auto py-px",
                       staticStyle: { "min-height": "2.25rem" },
                       on: {
-                        focusout: _vm.unfocus,
+                        focusout: function($event) {
+                          return _vm.unfocus($event)
+                        },
                         click: function($event) {
                           if ($event.target !== $event.currentTarget) {
                             return null
@@ -11266,7 +11284,7 @@ var render = function() {
                                   }
                                 }
                               },
-                              [_vm._v("x")]
+                              [_vm._v("×")]
                             )
                           ]
                         )
@@ -11291,7 +11309,7 @@ var render = function() {
                                     "font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white",
                                   on: { click: _vm.newSearch }
                                 },
-                                [_vm._v("x")]
+                                [_vm._v("×")]
                               )
                             ]
                           )

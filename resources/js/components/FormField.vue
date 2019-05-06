@@ -17,9 +17,10 @@
                 <div class="border-b-0 border border-40 relative">
                     <div class="form-input-bordered px-1 w-full ml-0 m-4">
                         <div
-                            class="flex items-center flex-wrap max-h-search overflow-auto"
+                            class="flex items-center flex-wrap max-h-search overflow-auto py-px"
                             style="min-height: 2.25rem;"
-                            @focusout="unfocus"
+                            ref="selectedItems"
+                            @focusout="unfocus($event)"
                             @click.self="$refs.search.focus()"
                         >
                             <div
@@ -50,7 +51,7 @@
                                         'text-80 hover:text-black': isFocused($index),
                                         'text-white-50% hover:text-white': isFocused($index)
                                         }"
-                                >x</span>
+                                >&times;</span>
                             </div>
                             <!--
                             @blur="clearSearch"
@@ -67,7 +68,7 @@
                                 <span>{{ search }}</span>
                                 <span @click="newSearch"
                                     class="font-sans font-bolder pl-2 cursor-pointer text-white-50% hover:text-white"
-                                >x</span>
+                                >&times;</span>
                             </div>
                             <input
                                 v-show="!abandoned"
@@ -190,22 +191,28 @@ export default {
         },
 
         focus(event, index, offset) {
-
-            if (offset < 0) {
-                if (index > 0) {
-                    index = index + offset
+            if (!this.focused.includes(index)) {
+                if (offset < 0) {
+                    if (index > 0) {
+                        index = index + offset
+                    }
+                }
+                else if (offset > 0) {
+                    if (index < this.selected.length - 1) {
+                        index = index + offset
+                    }
+                    else {
+                        index = null
+                    }
                 }
             }
-            else if (offset > 0) {
-                if (index < this.selected.length - 1) {
-                    index = index + offset
-                }
-                else {
-                    index = null
-                }
-            }
 
-            this.focused = [index]
+            if (index != null) {
+                this.focused = [index]
+            }
+            else {
+                this.focused = []
+            }
 
             Vue.nextTick(() => {
                 if (index == null) {
@@ -216,10 +223,16 @@ export default {
                 }
             })
 
-            console.log('focus', this.focused)
+
         },
 
-        unfocus() {
+        unfocus(event) {
+            if (event && event.relatedTarget && parent &&
+                event.relatedTarget != this.$refs.search &&
+                event.relatedTarget.parentElement == this.$refs.selectedItems) {
+                return
+            }
+
             this.focused = []
         },
 
@@ -231,32 +244,41 @@ export default {
         },
 
         addFocus(event, index, join) {
-
             let focused = this.focused || []
 
             if (join) {
                 if (focused.length == 0) {
                     this.focused = [index]
-                    console.log('addFocus-only', this.focused)
                     return
                 }
 
+                let highestIndex = Math.max(...focused)
                 let lowestIndex = Math.min(...focused)
 
-                for (let i = lowestIndex; i <= index; i++) {
-                    this.focused.push(i)
+                if (index > highestIndex) {
+                    for (let i = lowestIndex; i <= index; i++) {
+                        this.focused.push(i)
+                    }
                 }
+                else if (index < lowestIndex) {
+                    for (let i = index; i <= highestIndex; i++) {
+                        this.focused.push(i)
+                    }
+                }
+
             }
             else {
-                focused.push(index)
+                if (focused.includes(index)) {
+                    focused.splice(index, 1)
+                }
+                else {
+                    focused.push(index)
+                }
             }
 
             this.focused = focused.filter((value, index, self) => {
                 return self.indexOf(value) === index
             })
-            // .sort()
-
-            console.log('addFocus', this.focused)
         },
 
         moveFocus(event, offset) {
@@ -307,7 +329,6 @@ export default {
         },
 
         unselectFocused(event) {
-
             let focused = this.focused || []
             focused = focused.map(index => this.selected[index])
 
