@@ -1,8 +1,20 @@
 .input-focus-size {
   height: 0;
+  padding: 0;
 }
 
 .input-focus-size:focus {
-  height: auto;
+  height: 2rem;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  padding-left: .25rem;
+  padding-right: .25rem;
+}
+
+.form-input-within:focus-within {
+  border-radius: .5rem;
+  outline: none;
+  -webkit-box-shadow: 0 0 8px var(\--primary);
+  box-shadow: 0 0 8px var(\--primary);
 }
 

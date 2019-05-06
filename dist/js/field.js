@@ -374,6 +374,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 //
 //
 //
+//
 
 
 
@@ -419,7 +420,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             formData.append(this.field.attribute, this.value || []);
         },
         toggle: function toggle(event, id) {
-            this.clearSearch();
+            this.newSearch();
 
             if (this.selected.includes(id)) {
                 this.selected = this.selected.filter(function (selectedId) {
@@ -437,17 +438,15 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         focus: function focus(event, index, offset) {
             var _this2 = this;
 
-            if (!this.focused.includes(index)) {
-                if (offset < 0) {
-                    if (index > 0) {
-                        index = index + offset;
-                    }
-                } else if (offset > 0) {
-                    if (index < this.selected.length - 1) {
-                        index = index + offset;
-                    } else {
-                        index = null;
-                    }
+            if (offset < 0) {
+                if (index > 0) {
+                    index = index + offset;
+                }
+            } else if (offset > 0) {
+                if (index < this.selected.length - 1) {
+                    index = index + offset;
+                } else {
+                    index = null;
                 }
             }
 
@@ -547,7 +546,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             });
         },
         focusBack: function focusBack(event) {
-            if (event.target.selectionStart == 0 && this.selected.length > 0) {
+            if (event.target.selectionEnd == 0 && this.selected.length > 0) {
                 var index = this.selected.length - 1;
                 this.$refs.selectedItem[index].focus();
                 this.focused = [index];
@@ -588,29 +587,17 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             });
         },
         unselect: function unselect(event, index, id) {
-            var _this4 = this;
-
             this.selected = this.selected.filter(function (selectedId) {
                 return selectedId != id;
             });
             this.$emit('unselected', id);
 
-            __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
-                if (event.key == 'Backspace' && index > 0) {
-                    index = index - 1;
-                }
-                if (index < _this4.selected.length) {
-                    _this4.$refs.selectedItem[index].focus();
-                } else {
-                    index = null;
-                    _this4.$refs.search.focus();
-                }
-
-                _this4.focused = [index];
-            });
+            this.$refs.search.focus();
+            this.focused = [];
         },
         selectAll: function selectAll() {
             this.unfocus();
+
             var selected = this.selected;
 
             this.selectingAll = !this.selectingAll;
@@ -660,6 +647,8 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
             this.selected = selected;
             this.$emit('selected', selected);
+
+            this.newSearch();
         },
         clearSearch: function clearSearch() {
             this.unfocus();
@@ -668,16 +657,16 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             this.abandoned = false;
         },
         newSearch: function newSearch() {
-            var _this5 = this;
+            var _this4 = this;
 
             this.clearSearch();
 
             __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
-                _this5.$refs.search.focus();
+                _this4.$refs.search.focus();
             });
         },
         checkIfSelectAllIsActive: function checkIfSelectAllIsActive() {
-            var _this6 = this;
+            var _this5 = this;
 
             if (this.resources.length === 0 || this.preview) {
                 this.selectingAll = false;
@@ -687,7 +676,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             var visibleAndSelected = [];
 
             this.resources.forEach(function (resource) {
-                if (_this6.selected.includes(resource.value)) {
+                if (_this5.selected.includes(resource.value)) {
                     visibleAndSelected.push(resource.value);
                 }
             });
@@ -702,22 +691,22 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             this.abandoned = this.search && this.search.length > 0;
         },
         unabandon: function unabandon() {
-            var _this7 = this;
+            var _this6 = this;
 
             this.abandoned = false;
 
             __WEBPACK_IMPORTED_MODULE_1_vue___default.a.nextTick(function () {
-                _this7.$refs.search.focus();
-                _this7.$refs.search.select();
+                _this6.$refs.search.focus();
+                _this6.$refs.search.select();
             });
         }
     },
     computed: {
         selectedResources: function selectedResources() {
-            var _this8 = this;
+            var _this7 = this;
 
             var available = this.available.filter(function (resource) {
-                return _this8.selected.includes(resource.value);
+                return _this7.selected.includes(resource.value);
             });
 
             var selected = this.selected.map(function (id) {
@@ -729,11 +718,11 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             return selected;
         },
         resources: function resources() {
-            var _this9 = this;
+            var _this8 = this;
 
             if (this.preview) {
                 return this.available.filter(function (resource) {
-                    return _this9.selected.includes(resource.value);
+                    return _this8.selected.includes(resource.value);
                 });
             }
 
@@ -742,7 +731,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             }
 
             return this.available.filter(function (resource) {
-                return resource.display.toLowerCase().includes(_this9.search.toLowerCase());
+                return resource.display.toLowerCase().includes(_this8.search.toLowerCase());
             });
         },
         hasErrors: function hasErrors() {
@@ -11048,14 +11037,17 @@ var render = function() {
             _c("div", { staticClass: "border-b-0 border border-40 relative" }, [
               _c(
                 "div",
-                { staticClass: "form-input-bordered px-1 w-full ml-0 m-4" },
+                {
+                  staticClass:
+                    "form-input-bordered px-1 w-full ml-0 m-4 form-input-within"
+                },
                 [
                   _c(
                     "div",
                     {
                       ref: "selectedItems",
                       staticClass:
-                        "flex items-center flex-wrap max-h-search overflow-auto py-px",
+                        "flex items-center flex-wrap max-h-search overflow-auto py-px cursor-text",
                       staticStyle: { "min-height": "2.25rem" },
                       on: {
                         focusout: function($event) {
@@ -11065,7 +11057,7 @@ var render = function() {
                           if ($event.target !== $event.currentTarget) {
                             return null
                           }
-                          return _vm.$refs.search.focus()
+                          return _vm.unabandon($event)
                         }
                       }
                     },
@@ -11332,7 +11324,7 @@ var render = function() {
                         ],
                         ref: "search",
                         staticClass:
-                          "outline-none search-input-input px-1 py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size",
+                          "outline-none search-input-input py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size",
                         staticStyle: { "min-width": "2rem" },
                         attrs: {
                           disabled: _vm.disabled,
@@ -11384,6 +11376,21 @@ var render = function() {
                                 return null
                               }
                               return _vm.deleteBack($event)
+                            },
+                            function($event) {
+                              if (
+                                !$event.type.indexOf("key") &&
+                                _vm._k(
+                                  $event.keyCode,
+                                  "enter",
+                                  13,
+                                  $event.key,
+                                  "Enter"
+                                )
+                              ) {
+                                return null
+                              }
+                              $event.preventDefault()
                             }
                           ],
                           blur: _vm.abandon,

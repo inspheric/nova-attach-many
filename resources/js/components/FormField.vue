@@ -15,13 +15,13 @@
                     </div> -->
                 </div>
                 <div class="border-b-0 border border-40 relative">
-                    <div class="form-input-bordered px-1 w-full ml-0 m-4">
+                    <div class="form-input-bordered px-1 w-full ml-0 m-4 form-input-within">
                         <div
-                            class="flex items-center flex-wrap max-h-search overflow-auto py-px"
+                            class="flex items-center flex-wrap max-h-search overflow-auto py-px cursor-text"
                             style="min-height: 2.25rem;"
                             ref="selectedItems"
                             @focusout="unfocus($event)"
-                            @click.self="$refs.search.focus()"
+                            @click.self="unabandon"
                         >
                             <div
                                 v-for="(resource, $index) in selectedResources"
@@ -77,10 +77,11 @@
                                 @keydown.esc.prevent="clearSearch"
                                 @keydown.left="focusBack($event)"
                                 @keydown.delete="deleteBack($event)"
+                                @keydown.enter.prevent=""
                                 @blur="abandon"
                                 @focus="abandoned = false"
                                 ref="search"
-                                class="outline-none search-input-input px-1 py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size"
+                                class="outline-none search-input-input py-1.5 text-sm leading-normal bg-white rounded flex-grow flex-1 input-focus-size"
                                 type="text"
                                 spellcheck="false"
                                 style="min-width: 2rem;"
@@ -174,7 +175,7 @@ export default {
         },
 
         toggle(event, id) {
-            this.clearSearch()
+            this.newSearch()
 
             if(this.selected.includes(id)) {
                 this.selected = this.selected.filter(selectedId => selectedId != id)
@@ -191,19 +192,18 @@ export default {
         },
 
         focus(event, index, offset) {
-            if (!this.focused.includes(index)) {
-                if (offset < 0) {
-                    if (index > 0) {
-                        index = index + offset
-                    }
+
+            if (offset < 0) {
+                if (index > 0) {
+                    index = index + offset
                 }
-                else if (offset > 0) {
-                    if (index < this.selected.length - 1) {
-                        index = index + offset
-                    }
-                    else {
-                        index = null
-                    }
+            }
+            else if (offset > 0) {
+                if (index < this.selected.length - 1) {
+                    index = index + offset
+                }
+                else {
+                    index = null
                 }
             }
 
@@ -315,7 +315,7 @@ export default {
         },
 
         focusBack(event) {
-            if(event.target.selectionStart == 0 && this.selected.length > 0) {
+            if(event.target.selectionEnd == 0 && this.selected.length > 0) {
                 let index = this.selected.length - 1
                 this.$refs.selectedItem[index].focus()
                 this.focused = [index]
@@ -357,25 +357,13 @@ export default {
             this.selected = this.selected.filter(selectedId => selectedId != id)
             this.$emit('unselected', id)
 
-            Vue.nextTick(() => {
-                if (event.key == 'Backspace' && index > 0) {
-                    index = index - 1
-                }
-                if (index < this.selected.length) {
-                    this.$refs.selectedItem[index].focus()
-                }
-                else {
-                    index = null
-                    this.$refs.search.focus()
-                }
-
-                this.focused = [index]
-            })
-
+            this.$refs.search.focus()
+            this.focused = []
         },
 
         selectAll() {
             this.unfocus()
+
             let selected = this.selected;
 
             this.selectingAll = ! this.selectingAll;
@@ -424,6 +412,8 @@ export default {
 
             this.selected = selected
             this.$emit('selected', selected)
+
+            this.newSearch()
         },
 
         clearSearch() {
