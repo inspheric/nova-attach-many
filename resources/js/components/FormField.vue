@@ -36,7 +36,7 @@
                             @keydown.left.shift="moveFocus($event, -1)"
                             @keydown.right.shift="moveFocus($event, 1)"
                         >
-                            <div v-if="resource.avatar" class="m-px mr-2">
+                            <div v-if="resource.avatar" class="m-px mr-2 flex-no-shrink">
                                 <img :src="resource.avatar" class="w-6 h-6 block" :class="{
                                     'rounded-full': field.chips === true,
                                     'rounded': field.chips == 'square',
@@ -99,10 +99,7 @@
                         <fake-checkbox :checked="selected.includes(resource.value)" />
                     </div>
                     <div v-if="resource.avatar" class="mr-3 flex-no-shrink">
-                        <img :src="resource.avatar" class="w-8 h-8 block" :class="{
-                            'rounded-full': field.chips === true,
-                            'rounded': field.chips == 'square',
-                        }" />
+                        <img :src="resource.avatar" class="w-8 h-8 block" />
                     </div>
                     <span class="flex-no-grow">{{ resource.display }}</span>
                 </div>

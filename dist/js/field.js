@@ -392,9 +392,6 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 //
 //
 //
-//
-//
-//
 
 
 
@@ -23888,10 +23885,6 @@ var render = function() {
                           ? _c("div", { staticClass: "mr-3 flex-no-shrink" }, [
                               _c("img", {
                                 staticClass: "w-8 h-8 block",
-                                class: {
-                                  "rounded-full": _vm.field.chips === true,
-                                  rounded: _vm.field.chips == "square"
-                                },
                                 attrs: { src: resource.avatar }
                               })
                             ])
